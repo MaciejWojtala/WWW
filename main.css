@@ -1,0 +1,67 @@
+footer {
+    background-color: aliceblue;
+    color: green;
+    font-family: sans-serif;
+    font-size: 30px;
+    width: 50%;
+}
+
+table {
+    font-weight: normal;
+    border: 2px solid black;
+    border-collapse: collapse;
+    text-align: left;
+    padding: 8px 13px;
+}
+
+td {
+    font-weight: normal;
+    border: 2px solid black;
+    border-collapse: collapse;
+    padding: 8px 13px;
+}
+
+th {
+    font-weight: normal;
+    border: 2px solid black;
+    border-collapse: collapse;
+    padding: 8px 13px;
+}
+
+body {
+    text-align: center;
+}
+
+p#pierwszy {
+    background-color: yellow;
+    width: 75%;
+    margin-left: 12.5%;
+    margin-right: 12.5%;
+}
+
+p#drugi {
+    background-color: violet;
+    width: 75%;
+    margin-left: 12.5%;
+    margin-right: 12.5%;
+    position: relative;
+    z-index: -1;
+}
+
+p#trzeci {
+    background-color: blue;
+    width: 200px;
+    position: relative;
+    left: 170px;
+    top: 100px;
+}
+
+div {
+    position: relative;
+}
+
+img {
+    height: 100px;
+    width: 100px;
+    display: block;
+}
