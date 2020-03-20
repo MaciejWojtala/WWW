@@ -14,6 +14,21 @@ table {
     padding: 8px 13px;
 }
 
+table.opis_lotu {
+    background-color: lightblue;
+    width: 75%;
+    margin-left: 12.5%;
+    margin-right: 12.5%;
+}
+
+thead.opis_lotu {
+    background-color: blue;
+}
+
+li {
+    padding: 2px; margin: 4px;
+}
+
 td {
     font-weight: normal;
     border: 2px solid black;
@@ -52,7 +67,6 @@ p#trzeci {
     background-color: blue;
     width: 200px;
     position: relative;
-    height: 18px;
     left: 170px;
     top: 100px;
 }
@@ -65,110 +79,4 @@ img {
     height: 100px;
     width: 100px;
     display: block;
-}
-
-div.popup li.lista1 span {
-    display: none;
-}
-
-div.popup li.lista1:hover span {display: block;
-    position: absolute; top: -20px; left: 160px; width: 50px;
-    padding: 5px; margin: 10px;
-    background: blue;
-    text-align: center;
-}
-
-li.lista1:nth-child(even) {
-    background-color: green;
-}
-
-ul.lista2 {
-    list-style:  none;
-    text-align: left;
-    position: relative;
-}
-
-a.lista2:link {
-    text-decoration: none;
-    text-transform: uppercase;
-    color: blue;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-a.lista2:visited {
-    color: blue;
-    text-decoration: none;
-}
-
-@media (max-width: 600px) {
-    .flex-container {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .flex-container2 {
-        display: flex;
-        flex-direction: column;
-    }
-}
-
-@media (min-width: 600px) and (max-width: 1300px) {
-    .flex-container {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .flex-container2 {
-        display: flex;
-        flex-direction: row;
-    }
-}
-
-@media (min-width: 1300px) {
-    .flex-container {
-        display: flex;
-        flex-direction: row;
-    }
-
-    .flex-container2 {
-        display: flex;
-        flex-direction: row;
-    }
-}
-
-@media (max-width: 600px) {
-    .Znikajace {
-        display: none;
-    }
-}
-
-div {
-    margin-left: 3px;
-    margin-right: 3px;
-}
-
-tr.wiersz1 {
-    background-color: yellow;
-}
-
-tr.wiersz2 {
-    background-color: orange;
-}
-
-tr.wiersz3 {
-    background-color: red;
-}
-
-table.tabela2 {
-    font-weight: bolder;
-}
-
-form {
-    border: 2px solid black;
-    border-collapse: collapse;
-    padding: 8px 13px;
-}
-
-div.label {
-    padding: 5px 8px;
 }

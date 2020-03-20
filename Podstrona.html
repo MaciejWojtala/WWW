@@ -1,27 +1,21 @@
 <!DOCTYPE html>
-<!-- saved from url=(0040)file:///C:/Users/macie/Desktop/Loty.html -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="pl-PL"></html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Page Title</title>
+    <title>Opis lotu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="./main.css">
     <script src="file:///C:/Users/macie/Desktop/main.js"></script>
 </head>
 
 <body>
-    <h1>Opisy lotów</h1>
+    <h1>Opis lotu</h1>
 
-    <table>
-        <thead>
+    <table class = "opis_lotu">
+        <thead class = "opis_lotu">
             <tr>
-                <th>Miasto1</th>
-                <th>Zdjęcie1</th>
-                <th>Pogoda1</th>
-
-                <th>Miasto2</th>
-                <th>Zdjęcie2</th>
-                <th>Pogoda2</th>
+                <th>Dane miasta odlotu</th>
+                <th>Dane miasta przylotu</th>
 
                 <th>Czas lotu</th>
                 <th>Opis samolotu</th>
@@ -32,36 +26,32 @@
         <tbody>
             
             <tr>
-                <th> <a href = "https://pl.wikipedia.org/wiki/Warszawa">Warszawa</a></th>
-                <th> <a href = "https://pl.wikipedia.org/wiki/Warszawa#/media/Plik:Warsaw_montage.JPG">Zdjęcia Warszawy</a></th>
-                <th>Słonecznie</th>
-
-                <th> <a href = "https://pl.wikipedia.org/wiki/Londyn">Londyn</a></th>
-                <th> <a href = "https://pl.wikipedia.org/wiki/Londyn#/media/Plik:London_Lead_Image.jpg">Zdjęcia Londynu</a></th>
-                <th>Deszczowo</th>
-
-                <th>1,5 godziny</th>
-                <th>Opis samolotu</th>
                 <th>
                     <ul>
-                        <li>Jan Kowalski</li>
-                        <li>Albert Milucki</li>
-                        <li>Marcel Miśkiewicz</li>
+                        <li><a href = "https://pl.wikipedia.org/wiki/Warszawa">Warszawa</a></li>
+                        <li><img src="./Warszawa.jpg" alt="Zdjęcia Warszawy"></li>
+                        <li>Pogoda: Słonecznie</li>
                     </ul>
                 </th>
-            </tr>
 
-            <tr>
-                <th> <a href = "https://pl.wikipedia.org/wiki/Warszawa">Warszawa</a></th>
-                <th> <a href = "https://pl.wikipedia.org/wiki/Warszawa#/media/Plik:Warsaw_montage.JPG">Zdjęcia Warszawy</a></th>
-                <th>Słonecznie</th>
+                <th>
+                    <ul>
+                        <li><a href = "https://pl.wikipedia.org/wiki/Londyn">Londyn</a></li>
+                        <li> <img src="./Londyn.jpg" alt="Zdjęcia Londynu"></li>
+                        <li>Pogoda: Deszczowo</li>
+                    </ul>
+                </th>
 
-                <th> <a href = "https://pl.wikipedia.org/wiki/Berlin">Berlin</a></th>
-                <th> <a href = "https://pl.wikipedia.org/wiki/Berlin#/media/Plik:Collage_Berlin2.jpg">Zdjęcia Berlina</a></th>
-                <th>Słonecznie</th>
+                <th>1,5 godziny</th>
 
-                <th>1 godzina</th>
-                <th>Opis samolotu</th>
+                <th>
+                    <ul>
+                        <li>Typ: Boeing</li>
+                        <li> <img src="./Boeing.jpg" alt="Zdjęcia samolotu"></li>
+                        <li>Liczba miejsc: 70</li>
+                    </ul>
+                </th>
+
                 <th>
                     <ul>
                         <li>Jan Kowalski</li>
@@ -74,6 +64,8 @@
         </tbody>
 
     </table>
+
+    <p></p>
 
     <a href="./Loty.html">Wróć</a>
 
