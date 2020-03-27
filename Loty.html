@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="pl-PL"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Tablica lotów</title>
@@ -9,55 +9,175 @@
 </head>
 
 <body>
-    <h1>Tablica lotów</h1>
 
-    <img src="./Logo.jpg" alt="Logo firmy">
+    <div class = "grid-container">
 
-    <p id="pierwszy">Tabelka</p>
+            <div class = grid-item1>
+                <nav>
+                    <ul class = "lista2">
+                        <li><a class = "lista2" href = "./Opis_lotu.html">Opisy lotów</a></li>
+                        <li>
+                            <a class = "lista2" href = "./Inne.html">Inne</a>
+                            <ul class = "lista2">
+                                <li><a class = "lista2" href = "./Marketing.html">Marketing</a></li>
+                                <li><a class = "lista2" href = "./Cennik.html">Cennik</a></li>
+                                <li><a class = "lista2" href = "./Kontakt.html">Kontakt</a></li>
+                                <li><a class = "lista2" href = "./Aktualnosci.html">Aktualności</a></li>
+                                <li><a class = "lista2" href = "./Archiwum.html">Archiwum</a></li>
+                                <li><a class = "lista2" href = "./Regulamin.html">Regulamin</a></li>
+                            </ul>
+                        </li>
 
-    <div>
-        <p id="trzeci">Ale super lot!</p>
+                    </ul>
+                </nav>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Numer lotu</th>
-                    <th>Skąd</th>
-                    <th>Dokąd</th>
-                    <th>Data</th>
-                    <th>Godzina</th>
-                    <th>Link</th>
-                </tr>
-            </thead>
+            </div>
 
-            <tbody>
+                <div class = grid-item2>
+                    
+                    <h1>Tablica lotów</h1>
+
+                    <img src="./Logo.jpg" alt="Logo firmy">
+
+                    <p id="pierwszy">Tabelka</p>
+
+                    <div>
+                        <p id="trzeci">Ale super lot!</p>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Numer lotu</th>
+                                    <th>Skąd</th>
+                                    <th>Dokąd</th>
+                                    <th>Data</th>
+                                    <th>Godzina</th>
+                                    <th>Link</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                
+                                <tr class = "wiersz1">
+                                    <th>1</th>
+                                    <th>Warszawa</th>
+                                    <th>Londyn</th>
+                                    <th>20.11.2021</th>
+                                    <th>12:30</th>
+                                    <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                </tr>
+
+                                <tr class = "wiersz2">
+                                    <th>2</th>
+                                    <th>Warszawa</th>
+                                    <th>Berlin</th>
+                                    <th>20.11.2021</th>
+                                    <th>14:00</th>
+                                    <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                </tr>
+
+                                <tr class = "wiersz3">
+                                    <th>3</th>
+                                    <th>Londyn</th>
+                                    <th>Berlin</th>
+                                    <th>20.11.2021</th>
+                                    <th>17:30</th>
+                                    <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <p id="drugi">Stopka</p>
+
+                    <footer>Autor: Maciej Wojtala</footer>
+                </div>
+
+                <div class = grid-item3>
+                    <table class = "tabela2">
+                        <thead>
+                            <tr>
+                                <th>Skąd</th>
+                                <th>Dokąd</th>
+                                <th>Kiedy</th>
+                                <th>Odwołany/Opóźniony</th>
+                                <th>Czas opóźnienia</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            
+                            <tr class = "wiersz1">
+                                <th>Warszawa</th>
+                                <th>Londyn</th>
+                                <th>20.11.2021</th>
+                                <th>Opóźniony</th>
+                                <th> 15 minut</th>
+                            </tr>
+
+                            <tr class = "wiersz2">
+                                <th>Warszawa</th>
+                                <th>Berlin</th>
+                                <th>20.11.2021</th>
+                                <th>Opóźniony</th>
+                                <th>2 godziny</th>
+                            </tr>
+
+                            <tr class = "wiersz3">
+                                <th>Londyn</th>
+                                <th>Berlin</th>
+                                <th>20.11.2021</th>
+                                <th>Odwołany</th>
+                                <th>Nie dotyczy</th>
+                            </tr>
+                        
+                        </tbody>
+                    </table>
                 
-                <tr>
-                    <th>1</th>
-                    <th>Warszawa</th>
-                    <th>Londyn</th>
-                    <th>20.11.2021</th>
-                    <th>12:30</th>
-                    <th> <a href = "./Podstrona.html">Opis</a></th>
-                </tr>
+                </div>
 
-                <tr>
-                    <th>2</th>
-                    <th>Warszawa</th>
-                    <th>Berlin</th>
-                    <th>20.11.2021</th>
-                    <th>14:00</th>
-                    <th> <a href = "./Podstrona.html">Opis</a></th>
-                </tr>
+                <div class = grid-item4>
+                    <p></p>
+                    <form action = "*">
 
-            </tbody>
+                        <div class = "label">
+                            <label>Skąd:</label>
+                            <select> 
+                                <option value="Warszawa">Warszawa</option>
+                                <option value="Londyn">Londyn</option>
+                                <option value="Berlin">Berlin</option>
+                            </select>
+                        </div>
+                        
+                        <div class = "label">
+                            <label>Dokąd:</label>
+                            <select> 
+                                <option value="Warszawa">Warszawa</option>
+                                <option value="Londyn">Londyn</option>
+                                <option value="Berlin">Berlin</option>
+                            </select>
+                        </div>
+                        
+                        <div class = "label">
+                            <label>Imię:</label>
+                            <input type = "text">
+                        </div>
+                        
+                        <div class = "label">
+                            <label>Nazwisko:</label>
+                            <input type = "text">
+                        </div>
 
-        </table>
+                        <input type="reset" value="Wyczyść">
+                        <input type="submit" value="Wyślij">
+                    
+                    </form>
+
+                </div>
+
     </div>
-
-    <p id="drugi">Stopka</p>
-
-    <footer>Autor: Maciej Wojtala</footer>
 
 
 </body></html>
