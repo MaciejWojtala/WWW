@@ -12,6 +12,8 @@ table {
     border-collapse: collapse;
     text-align: left;
     padding: 8px 13px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 td {
@@ -100,7 +102,7 @@ a.lista2:visited {
     text-decoration: none;
 }
 
-@media (max-width: 600px) {
+@media screen and (max-width: 1065px) {
     .flex-container {
         display: flex;
         flex-direction: column;
@@ -112,7 +114,7 @@ a.lista2:visited {
     }
 }
 
-@media (min-width: 600px) and (max-width: 1300px) {
+@media screen and (min-width: 600px) and (max-width: 1300px) {
     .flex-container {
         display: flex;
         flex-direction: column;
@@ -124,7 +126,7 @@ a.lista2:visited {
     }
 }
 
-@media (min-width: 1300px) {
+@media screen and (min-width: 1500px) {
     .flex-container {
         display: flex;
         flex-direction: row;
@@ -136,7 +138,7 @@ a.lista2:visited {
     }
 }
 
-@media (max-width: 600px) {
+@media screen and (max-width: 1085px) {
     .Znikajace {
         display: none;
     }
@@ -147,15 +149,15 @@ div {
     margin-right: 3px;
 }
 
-tr.wiersz1 {
+tr.male_opoznienie {
     background-color: yellow;
 }
 
-tr.wiersz2 {
+tr.duze_opoznienie {
     background-color: orange;
 }
 
-tr.wiersz3 {
+tr.odwolany {
     background-color: red;
 }
 
@@ -167,6 +169,8 @@ form {
     border: 2px solid black;
     border-collapse: collapse;
     padding: 8px 13px;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 div.label {
@@ -224,12 +228,12 @@ section.section1 {
     width: 80%;
 }
 
-@media (min-width: 1300px) {
+@media screen and (min-width: 1500px) {
 
     div.grid-container {
         display: grid;
         grid-template-columns: 200px 3fr 1fr;
-        grid-template-rows: 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1 fr;
         column-gap: 15px;
     }
 
@@ -260,20 +264,27 @@ section.section1 {
         grid-row-start: 2;
         grid-row-end: 3;
     }
+    div.grid-footer {
+        grid-column-start: 1;
+        grid-column-end: 4;
+        grid-row-start: 3;
+        grid-row-end: 4;
+
+    }
 }
 
-@media (min-width: 1065px) and (max-width: 1300px) {
+@media screen and (min-width: 1065px) and (max-width: 1500px) {
 
     div.grid-container {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
-        grid-template-rows: auto auto;
+        grid-template-rows: auto auto auto auto;
         column-gap: 15px;
     }
 
     div.grid-item1 {
-        grid-column-start: 3;
-        grid-column-end: 4;
+        grid-column-start: 2;
+        grid-column-end: 3;
         grid-row-start: 1;
         grid-row-end: 2;
     }
@@ -298,14 +309,22 @@ section.section1 {
         grid-row-start: 3;
         grid-row-end: 4;
     }
+
+    div.grid-footer {
+        grid-column-start: 1;
+        grid-column-end: 5;
+        grid-row-start: 4;
+        grid-row-end: 5;
+
+    }
 }
 
-@media (max-width: 1065px) {
+@media screen and (max-width: 1065px) {
 
     div.grid-container {
         display: grid;
         grid-template-columns: auto;
-        grid-template-rows: auto auto auto auto;
+        grid-template-rows: auto auto auto auto auto;
         column-gap: 15px;
     }
 
@@ -335,6 +354,14 @@ section.section1 {
         grid-column-end: 2;
         grid-row-start: 4;
         grid-row-end: 5;
+
+        div.grid-footer {
+            grid-column-start: 1;
+            grid-column-end: 2;
+            grid-row-start: 5;
+            grid-row-end: 6;
+    
+        }
     }
 }
 
@@ -345,7 +372,7 @@ div.zaslona {
     z-index: 2;
     font-size: 50px;
     font-weight: bold;
-    background-color: green;
+    background-color: white;
     opacity: 0.7;
 }
 
