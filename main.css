@@ -114,7 +114,7 @@ a.lista2:visited {
     }
 }
 
-@media screen and (min-width: 600px) and (max-width: 1300px) {
+@media screen and (min-width: 600px) and (max-width: 1500px) {
     .flex-container {
         display: flex;
         flex-direction: column;
@@ -367,6 +367,7 @@ section.section1 {
 
 div.zaslona {
     position: fixed;
+    margin: -8px;
     width: 100%;
     height: 100%;
     z-index: 2;
