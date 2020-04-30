@@ -2,6 +2,8 @@ import {Builder, Capabilities} from 'selenium-webdriver';
 import { expect } from 'chai';
 import { driver } from 'mocha-webdriver';
 
+const filePath : string = 'file://' + process.cwd() + '/Loty.html';
+
 function yearAfterDate() : string {
     const d = new Date();
     let month = (d.getMonth() + 1).toString();
@@ -19,7 +21,7 @@ function yearAfterDate() : string {
 describe('test1', function () {
     it('Reset', async function() {
         this.timeout(20000);
-        await driver.get('file:///C:/Users/macie/Desktop/Studia/WWW/nowy_projekt/Loty.html');
+        await driver.get(filePath);
         
         expect(await driver.find('select[id=Dokąd]').getText()).to.include('Warszawa');
         await driver.find('input[name=Imię]').sendKeys('Jan');
@@ -31,7 +33,7 @@ describe('test1', function () {
 describe('test2', function () {
     it('Submit', async function() {
         this.timeout(20000);
-        await driver.get('file:///C:/Users/macie/Desktop/Studia/WWW/nowy_projekt/Loty.html');
+        await driver.get(filePath);
         await driver.find('input[type=submit]');
 
         let clickable : boolean = true;
@@ -58,7 +60,7 @@ describe('test3', function () {
         const date = yearAfterDate();
 
         this.timeout(20000);
-        await driver.get('file:///C:/Users/macie/Desktop/Studia/WWW/nowy_projekt/Loty.html');
+        await driver.get(filePath);
         await driver.find('input[type=reset]').doClick();
 
         await driver.find('input[name=Imię]').sendKeys('Jan');
@@ -84,7 +86,7 @@ describe('test4', function () {
         const date = yearAfterDate();
 
         this.timeout(20000);
-        await driver.get('file:///C:/Users/macie/Desktop/Studia/WWW/nowy_projekt/Loty.html');
+        await driver.get(filePath);
         await driver.find('input[type=reset]').doClick();
 
         await driver.find('input[name=Imię]').sendKeys('Jan');
