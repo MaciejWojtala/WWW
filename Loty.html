@@ -1,180 +1,187 @@
 <!DOCTYPE html>
-<html lang="pl-PL"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Tablica lotów</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="./main.css">
-    <script src="file:///C:/Users/macie/Desktop/main.js"></script>
-</head>
+<html lang="pl-PL">
+    <head>
+        <script src = "./head_script.js" id = "head_script"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Tablica lotów</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" media="screen" href="./main.css">
+    </head>
 
-<body>
+    <body>
 
-    <div class = "grid-container">
+        <div class = "grid-container" id = "first_level_grid">
 
-            <div class = grid-item1>
-                <nav>
-                    <ul class = "lista2">
-                        <li><a class = "lista2" href = "./Opis_lotu.html">Opisy lotów</a></li>
-                        <li>
-                            <a class = "lista2" href = "./Inne.html">Inne</a>
-                            <ul class = "lista2">
-                                <li><a class = "lista2" href = "./Marketing.html">Marketing</a></li>
-                                <li><a class = "lista2" href = "./Cennik.html">Cennik</a></li>
-                                <li><a class = "lista2" href = "./Kontakt.html">Kontakt</a></li>
-                                <li><a class = "lista2" href = "./Aktualnosci.html">Aktualności</a></li>
-                                <li><a class = "lista2" href = "./Archiwum.html">Archiwum</a></li>
-                                <li><a class = "lista2" href = "./Regulamin.html">Regulamin</a></li>
-                            </ul>
-                        </li>
+                <div class = grid-item1>
+                    <nav>
+                        <ul class = "lista2">
+                            <li><a class = "lista2" id = "menu_link1" href = "./Opis_lotu.html">Opis lotu</a></li>
+                            <li>
+                                <a class = "lista2" id = "menu_link2" href = "./Inne.html">Inne</a>
+                                <ul class = "lista2">
+                                    <li><a class = "lista2" id = "menu_link3" href = "./Marketing.html">Marketing</a></li>
+                                    <li><a class = "lista2" id = "menu_link4" href = "./Cennik.html">Cennik</a></li>
+                                    <li><a class = "lista2" id = "menu_link5" href = "./Kontakt.html">Kontakt</a></li>
+                                    <li><a class = "lista2" id = "menu_link6" href = "./Aktualnosci.html">Aktualności</a></li>
+                                    <li><a class = "lista2" id = "menu_link7" href = "./Archiwum.html">Archiwum</a></li>
+                                    <li><a class = "lista2" id = "menu_link8" href = "./Regulamin.html">Regulamin</a></li>
+                                </ul>
+                            </li>
 
-                    </ul>
-                </nav>
+                        </ul>
+                    </nav>
 
-            </div>
+                </div>
 
-                <div class = grid-item2>
-                    
-                    <h1>Tablica lotów</h1>
+                    <div class = grid-item2>
+                        
+                        <h1>Tablica lotów</h1>
 
-                    <img src="./Logo.jpg" alt="Logo firmy">
+                        <img src="./Logo.jpg" alt="Logo firmy">
 
-                    <p id="pierwszy">Tabelka</p>
+                        <p id="pierwszy">Tabelka</p>
 
-                    <div>
-                        <p id="trzeci">Ale super lot!</p>
+                        <div>
+                            <p id="trzeci">Ale super lot!</p>
 
-                        <table>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Numer lotu</th>
+                                        <th>Skąd</th>
+                                        <th>Dokąd</th>
+                                        <th>Data</th>
+                                        <th>Godzina</th>
+                                        <th>Link</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                    <tr class = "male_opoznienie">
+                                        <th>1</th>
+                                        <th>Warszawa</th>
+                                        <th>Londyn</th>
+                                        <th>20.11.2021</th>
+                                        <th>12:30</th>
+                                        <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                    </tr>
+
+                                    <tr class = "duze_opoznienie">
+                                        <th>2</th>
+                                        <th>Warszawa</th>
+                                        <th>Berlin</th>
+                                        <th>20.11.2021</th>
+                                        <th>14:00</th>
+                                        <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                    </tr>
+
+                                    <tr class = "odwolany">
+                                        <th>3</th>
+                                        <th>Londyn</th>
+                                        <th>Berlin</th>
+                                        <th>20.11.2021</th>
+                                        <th>17:30</th>
+                                        <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class = "grid-footer">
+                        <p id="drugi">Stopka</p>
+                        <footer>Autor: Maciej Wojtala</footer>
+                    </div>
+
+                    <div class = grid-item3>
+                        <table class = "tabela2" id = "opoznienia">
                             <thead>
                                 <tr>
-                                    <th>Numer lotu</th>
                                     <th>Skąd</th>
                                     <th>Dokąd</th>
-                                    <th>Data</th>
-                                    <th>Godzina</th>
-                                    <th>Link</th>
+                                    <th>Kiedy</th>
+                                    <th>Opóź<wbr>nienie/<wbr>Odwo<wbr>łanie</th>
                                 </tr>
                             </thead>
 
                             <tbody>
                                 
                                 <tr class = "male_opoznienie">
-                                    <th>1</th>
-                                    <th>Warszawa</th>
-                                    <th>Londyn</th>
-                                    <th>20.11.2021</th>
-                                    <th>12:30</th>
-                                    <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                    <td>War<wbr>szawa</td>
+                                    <td>Lon<wbr>dyn</td>
+                                    <td>20 XI</td>
+                                    <td> 15 min</td>
                                 </tr>
 
                                 <tr class = "duze_opoznienie">
-                                    <th>2</th>
-                                    <th>Warszawa</th>
-                                    <th>Berlin</th>
-                                    <th>20.11.2021</th>
-                                    <th>14:00</th>
-                                    <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                    <td>War<wbr>szawa</td>
+                                    <td>Ber<wbr>lin</td>
+                                    <td>20 XI</td>
+                                    <td>2 h</td>
                                 </tr>
 
                                 <tr class = "odwolany">
-                                    <th>3</th>
-                                    <th>Londyn</th>
-                                    <th>Berlin</th>
-                                    <th>20.11.2021</th>
-                                    <th>17:30</th>
-                                    <th> <a href = "./Opis_lotu.html">Opis</a></th>
+                                    <td>Lon<wbr>dyn</td>
+                                    <td>Ber<wbr>lin</td>
+                                    <td>20 XI</td>
+                                    <td>Odwo<wbr>łany</td>
                                 </tr>
-
-                            </tbody>
-
-                        </table>
-                    </div>
-                </div>
-
-                <div class = "grid-footer">
-                    <p id="drugi">Stopka</p>
-                    <footer>Autor: Maciej Wojtala</footer>
-                </div>
-
-                <div class = grid-item3>
-                    <table class = "tabela2">
-                        <thead>
-                            <tr>
-                                <th>Skąd</th>
-                                <th>Dokąd</th>
-                                <th>Kiedy</th>
-                                <th>Opóź<wbr>nienie/<wbr>Odwo<wbr>łanie</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
                             
-                            <tr class = "male_opoznienie">
-                                <th>War<wbr>szawa</th>
-                                <th>Lon<wbr>dyn</th>
-                                <th>20 XI</th>
-                                <th> 15 min</th>
-                            </tr>
-
-                            <tr class = "duze_opoznienie">
-                                <th>War<wbr>szawa</th>
-                                <th>Ber<wbr>lin</th>
-                                <th>20 XI</th>
-                                <th>2 h</th>
-                            </tr>
-
-                            <tr class = "odwolany">
-                                <th>Lon<wbr>dyn</th>
-                                <th>Ber<wbr>lin</th>
-                                <th>20 XI</th>
-                                <th>Odwo<wbr>łany</th>
-                            </tr>
-                        
-                        </tbody>
-                    </table>
-                
-                </div>
-
-                <div class = grid-item4>
-                    <p></p>
-                    <form action = "*">
-
-                        <div class = "label">
-                            <label>Skąd:</label>
-                            <select> 
-                                <option value="Warszawa">Warszawa</option>
-                                <option value="Londyn">Londyn</option>
-                                <option value="Berlin">Berlin</option>
-                            </select>
-                        </div>
-                        
-                        <div class = "label">
-                            <label>Dokąd:</label>
-                            <select> 
-                                <option value="Warszawa">Warszawa</option>
-                                <option value="Londyn">Londyn</option>
-                                <option value="Berlin">Berlin</option>
-                            </select>
-                        </div>
-                        
-                        <div class = "label">
-                            <label>Imię:</label>
-                            <input type = "text">
-                        </div>
-                        
-                        <div class = "label">
-                            <label>Nazwisko:</label>
-                            <input type = "text">
-                        </div>
-
-                        <input type="reset" value="Wyczyść">
-                        <input type="submit" value="Wyślij">
+                            </tbody>
+                        </table>
                     
-                    </form>
+                    </div>
 
-                </div>
+                    <div class = grid-item4>
+                        <p></p>
+                        <form action = "*" id = "formularz_lotu">
 
-    </div>
+                            <div class = "label">
+                                <label>Skąd:</label>
+                                <select id = "Skąd"> 
+                                    <option value="Warszawa">Warszawa</option>
+                                    <option value="Londyn">Londyn</option>
+                                    <option value="Berlin">Berlin</option>
+                                </select>
+                            </div>
+                            
+                            <div class = "label">
+                                <label>Dokąd:</label>
+                                <select id = "Dokąd"> 
+                                    <option value="Warszawa">Warszawa</option>
+                                    <option value="Londyn">Londyn</option>
+                                    <option value="Berlin">Berlin</option>
+                                </select>
+                            </div>
 
+                            <div class = "label">
+                                <label>Data:</label>
+                                <input type = "date" name = "data">
+                            </div>
+                            
+                            <div class = "label">
+                                <label>Imię:</label>
+                                <input type = "text" name = "Imię">
+                            </div>
+                            
+                            <div class = "label">
+                                <label>Nazwisko:</label>
+                                <input type = "text" name = "Nazwisko">
+                            </div>
 
-</body></html>
+                            <input type = "reset" value = "Wyczyść">
+                            <input type = "submit" value = "Wyślij">
+                        
+                        </form>
+
+                    </div>
+
+        </div>
+
+        <script src = "./main.js" id = "main_script"></script>
+    </body>
+</html>
