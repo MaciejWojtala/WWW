@@ -319,6 +319,7 @@
             var headers3 = document.getElementsByClassName("pytanie_nagłówek");
             var grid_time = document.getElementById("grid_czas");
             var introduction_content = document.getElementById("wstęp");
+            var time_content = document.getElementById("czas");
             for (var i = 0; i < headers3.length; i++) {
                 var header3 = headers3[i];
                 header3.textContent = "Treść zadania";
@@ -327,6 +328,8 @@
                 spent_time_1[i] = 0;
             question_number_1 = 1;
             time_1 = 0;
+            time_content.textContent = time_1.toString() + " sekund" +
+                get_polish_suffix(time_1);
             start_button_1.style.display = "none";
             highscore_button_1.style.display = "none";
             grid_introduction.style.display = "block";

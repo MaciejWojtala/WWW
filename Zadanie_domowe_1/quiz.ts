@@ -463,6 +463,7 @@
             const headers3 = document.getElementsByClassName("pytanie_nagłówek");
             const grid_time = document.getElementById("grid_czas");
             const introduction_content = document.getElementById("wstęp");
+            const time_content = document.getElementById("czas");
 
             for (let i = 0; i < headers3.length; i++) {
                 const header3 = headers3[i] as HTMLElement;
@@ -474,6 +475,8 @@
 
             question_number = 1;
             time = 0;
+            time_content.textContent = time.toString() + " sekund" +
+                        get_polish_suffix(time);
             start_button.style.display = "none";
             highscore_button.style.display = "none";
             grid_introduction.style.display = "block";
