@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang = "pl-PL">
+    <head>
+        <meta http-equiv = "Content-Type" content = "text/html; charset=UTF-8">
+        <meta http-equiv = "X-UA-Compatible" content = "IE=edge">
+        <title>Quiz</title>
+        <meta name = "viewport" content = "width=device-width, initial-scale=1">
+        <link rel = "stylesheet" type = "text/css" media = "screen" href = "./quiz.css">
+    </head>
+
+    <body>
+        <h1 id = "tytuł_strony">Quiz</h1>
+        
+        <div id = "grid_ogólny">
+            
+            <div id = "grid_przycisk_nowy_quiz" class = "grid_przyciski_startowe">
+                <button type = "button" id = "nowy_quiz" class = "przycisk_startowy">
+                    Zacznij nowy quiz
+                </button>
+            </div>
+
+            <div id = "grid_przycisk_najlepsze_wyniki" class = "grid_przyciski_startowe">
+                <button type = "button" id = "najlepsze_wyniki" class = "przycisk_startowy">
+                    Pokaż najlepsze wyniki
+                </button>
+            </div>
+            
+            <div id = "grid_wstęp">
+                <h2 id = "wstęp_nagłówek">Wstęp</h2>
+
+                <article id = "wstęp"></article>
+            </div>
+
+            <div id = "grid_pytanie 1" class = grid_pytanie>
+                <h3 id = "pytanie_nagłówek 1" class = "pytanie_nagłówek"></h3>
+                <form action = "*" id = "formularz_odpowiedzi 1" class = "formularz_odpowiedzi">
+                    <label id = "pytanie 1" class = "pytanie"></label>
+                    <input type = "number" name = "odpowiedź" class = "odpowiedź" id = "odpowiedź 1">
+                </form>
+            </div>
+
+            <div id = "grid_pytanie 2" class = grid_pytanie>
+                <h3 id = "pytanie_nagłówek 2" class = "pytanie_nagłówek"></h3>
+                <form action = "*" id = "formularz_odpowiedzi 2" class = "formularz_odpowiedzi">
+                    <label id = "pytanie 2" class = "pytanie"></label>
+                    <input type = "number" name = "odpowiedź" class = "odpowiedź" id = "odpowiedź 2">
+                </form>
+            </div>
+
+            <div id = "grid_pytanie 3" class = grid_pytanie>
+                <h3 id = "pytanie_nagłówek 3" class = "pytanie_nagłówek"></h3>
+                <form action = "*" id = "formularz_odpowiedzi 3" class = "formularz_odpowiedzi">
+                    <label id = "pytanie 3" class = "pytanie"></label>
+                    <input type = "number" name = "odpowiedź" class = "odpowiedź" id = "odpowiedź 3">
+                </form>
+            </div>
+
+            <div id = "grid_pytanie 4" class = grid_pytanie>
+                <form action = "*" id = "formularz_odpowiedzi 4" class = "formularz_odpowiedzi">
+                <h3 id = "pytanie_nagłówek 4" class = "pytanie_nagłówek"></h3>
+                    <label id = "pytanie 4" class = "pytanie"></label>
+                    <input type = "number" name = "odpowiedź" class = "odpowiedź" id = "odpowiedź 4">
+                </form>
+            </div>
+
+            <div id = "grid_pytanie 5" class = grid_pytanie>
+                <form action = "*" id = "formularz_odpowiedzi 5" class = "formularz_odpowiedzi">
+                <h3 id = "pytanie_nagłówek 5" class = "pytanie_nagłówek"></h3>
+                    <label id = "pytanie 5" class = "pytanie"></label>
+                    <input type = "number" name = "odpowiedź" class = "odpowiedź" id = "odpowiedź 5">
+                </form>
+            </div>
+
+            <div id = "grid_pytanie 6" class = grid_pytanie>
+                <form action = "*" id = "formularz_odpowiedzi 6" class = "formularz_odpowiedzi">
+                <h3 id = "pytanie_nagłówek 6" class = "pytanie_nagłówek"></h3>
+                    <label id = "pytanie 6" class = "pytanie"></label>
+                    <input type = "number" name = "odpowiedź" class = "odpowiedź" id = "odpowiedź 6">
+                </form>
+            </div>
+
+            <div id = "grid_przyciski_zmiana_pytania">
+                <button type = "button" id = "poprzednie_pytanie" class = "przycisk_przejścia">
+                    Poprzednie zadanie
+                </button>
+
+                <button type = "button" id = "następne_pytanie" class = "przycisk_przejścia">
+                    Następne zadanie
+                </button>
+            </div>
+
+            <div id = "grid_przycisk_zakończenie_quizu">
+                <button type = "button" id = "zakończ_quiz" class = "przycisk_zakończenia">
+                    Zakończ quiz
+                </button>
+            </div>
+                
+            <div id = "grid_przycisk_anulowanie_quizu">
+                <button type = "button" id = "anuluj_quiz"
+                        class = "przycisk_zakończenia, wysokie_urządzenia">
+                    Anuluj quiz
+                </button>
+            </div>
+
+            <div id = "grid_czas">
+                <h2 id = "czas_nagłówek" class = "wysokie_urządzenia">Czas</h2>
+
+                <article id = "czas" class = "wysokie_urządzenia"></article>
+            </div>
+
+            <div id = "grid_punktacja">
+                <h2 id = "punktacja_nagłówek" class = "wysokie_urządzenia">
+                    Punktacja
+                </h2>
+
+                <article id = "punktacja" class = "wysokie_urządzenia"></article>
+            </div>
+
+            <div id = "grid_liczba_pytań">
+                <h2 id = "liczba_pytań_nagłówek" class = "wysokie_urządzenia">
+                    Informacje dodatkowe
+                </h2>
+
+                <article id = "liczba_pytań" class = "wysokie_urządzenia"></article>
+            </div>
+
+            <div id = "grid_liczba_punktów">
+                <article id = "liczba_punktów"></article>
+            </div>
+
+            <div id = "grid_tabela_podsumowanie">
+                <table id = "tabela_podsumowanie">
+                    <thead id = "tabela_podsumowanie_nagłówek">
+                        <tr id = "tabela_podsumowanie_nagłówek_wiersz">
+                            <th class = "tabela_podsumowanie_nagłówek_kolumna1">
+                                Nu<wbr>mer za<wbr>da<wbr>nia
+                            </th>
+                            <th class = "tabela_podsumowanie_nagłówek_kolumna2">
+                                Two<wbr>ja od<wbr>po<wbr>wiedź
+                            </th>
+                            <th class = "tabela_podsumowanie_nagłówek_kolumna3">
+                                Po<wbr>praw<wbr>na od<wbr>po<wbr>wiedź
+                            </th>
+                            <th class = "tabela_podsumowanie_nagłówek_kolumna4">
+                                Czas spę<wbr>dzo<wbr>ny na za<wbr>da<wbr>niu
+                            </th>
+                            <th class = "tabela_podsumowanie_nagłówek_kolumna5">
+                                Ka<wbr>ra cza<wbr>so<wbr>wa
+                            </th>
+                            <th class = "tabela_podsumowanie_nagłówek_kolumna6">
+                                Wy<wbr>nik za<wbr>da<wbr>nia
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody id = "tabela_podsumowanie_zawartość">
+                        
+                        <tr id = "tabela_podsumowanie_wiersz1">
+                            <td class = "tabela_podsumowanie_kolumna1">a</td>
+                            <td class = "tabela_podsumowanie_kolumna2">s</td>
+                            <td class = "tabela_podsumowanie_kolumna3">d</td>
+                            <td class = "tabela_podsumowanie_kolumna4">f</td>
+                            <td class = "tabela_podsumowanie_kolumna5">g</td>
+                            <td class = "tabela_podsumowanie_kolumna6">h</td>
+                        </tr>
+
+                        <tr id = "tabela_podsumowanie_wiersz2">
+                            <td class = "tabela_podsumowanie_kolumna1">a</td>
+                            <td class = "tabela_podsumowanie_kolumna2">s</td>
+                            <td class = "tabela_podsumowanie_kolumna3">d</td>
+                            <td class = "tabela_podsumowanie_kolumna4">f</td>
+                            <td class = "tabela_podsumowanie_kolumna5">g</td>
+                            <td class = "tabela_podsumowanie_kolumna6">h</td>
+                        </tr>
+
+                        <tr id = "tabela_podsumowanie_wiersz3">
+                            <td class = "tabela_podsumowanie_kolumna1"></td>
+                            <td class = "tabela_podsumowanie_kolumna2"></td>
+                            <td class = "tabela_podsumowanie_kolumna3"></td>
+                            <td class = "tabela_podsumowanie_kolumna4"></td>
+                            <td class = "tabela_podsumowanie_kolumna5"></td>
+                            <td class = "tabela_podsumowanie_kolumna6"></td>
+                        </tr>
+
+                        <tr id = "tabela_podsumowanie_wiersz4">
+                            <td class = "tabela_podsumowanie_kolumna1"></td>
+                            <td class = "tabela_podsumowanie_kolumna2"></td>
+                            <td class = "tabela_podsumowanie_kolumna3"></td>
+                            <td class = "tabela_podsumowanie_kolumna4"></td>
+                            <td class = "tabela_podsumowanie_kolumna5"></td>
+                            <td class = "tabela_podsumowanie_kolumna6"></td>
+                        </tr>
+
+                        <tr id = "tabela_podsumowanie_wiersz5">
+                            <td class = "tabela_podsumowanie_kolumna1"></td>
+                            <td class = "tabela_podsumowanie_kolumna2"></td>
+                            <td class = "tabela_podsumowanie_kolumna3"></td>
+                            <td class = "tabela_podsumowanie_kolumna4"></td>
+                            <td class = "tabela_podsumowanie_kolumna5"></td>
+                            <td class = "tabela_podsumowanie_kolumna6"></td>
+                        </tr>
+
+                        <tr id = "tabela_podsumowanie_wiersz6">
+                            <td class = "tabela_podsumowanie_kolumna1"></td>
+                            <td class = "tabela_podsumowanie_kolumna2"></td>
+                            <td class = "tabela_podsumowanie_kolumna3"></td>
+                            <td class = "tabela_podsumowanie_kolumna4"></td>
+                            <td class = "tabela_podsumowanie_kolumna5"></td>
+                            <td class = "tabela_podsumowanie_kolumna6"></td>
+                        </tr>
+                    
+                    </tbody>
+                </table>
+
+                <div id = "grid_przyciski_zapis">
+                    <button type = "button" id = "zapis_wyniku" class = "przycisk_zapisu">
+                        Zapisz tylko wynik
+                    </button>
+
+                    <button type = "button" id = "zapis_wyniku_i_statystyk" class = "przycisk_zapisu">
+                        Zapisz wynik i statystyki
+                    </button>
+                </div>
+            
+            </div>
+
+
+            <div id = "grid_tabela_najlepsze_wyniki">
+                <table id = "tabela_najlepsze_wyniki">
+                    <thead id = "tabela_najlepsze_wyniki_nagłówek">
+                        <tr id = "tabela_podsumowanie_nagłówek_wiersz">
+                            <th class = "tabela_najlepsze_wyniki_nagłówek_kolumna1">
+                                Pozycja
+                            </th>
+                            <th class = "tabela_najlepsze_wyniki_nagłówek_kolumna2">
+                                Wynik
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody id = "tabela_najlepsze_wyniki_zawartość">
+                        
+                        <tr id = "tabela_najlepsze_wyniki_wiersz1">
+                            <td class = "tabela_najlepsze_wyniki_kolumna1"></td>
+                            <td class = "tabela_najlepsze_wyniki_kolumna2"></td>
+                        </tr>
+
+                        <tr id = "tabela_najlepsze_wyniki_wiersz2">
+                            <td class = "tabela_najlepsze_wyniki_kolumna1"></td>
+                            <td class = "tabela_najlepsze_wyniki_kolumna2"></td>
+                        </tr>
+
+                        <tr id = "tabela_najlepsze_wyniki_wiersz3">
+                            <td class = "tabela_najlepsze_wyniki_kolumna1"></td>
+                            <td class = "tabela_najlepsze_wyniki_kolumna2"></td>
+                        </tr>
+
+                        <tr id = "tabela_najlepsze_wyniki_wiersz4">
+                            <td class = "tabela_najlepsze_wyniki_kolumna1"></td>
+                            <td class = "tabela_najlepsze_wyniki_kolumna2"></td>
+                        </tr>
+
+                        <tr id = "tabela_najlepsze_wyniki_wiersz5">
+                            <td class = "tabela_najlepsze_wyniki_kolumna1"></td>
+                            <td class = "tabela_najlepsze_wyniki_kolumna2"></td>
+                        </tr>
+                    
+                    </tbody>
+                </table>
+                
+            </div>
+
+                <div id = "grid_przycisk_wróć">
+                    <button type = "button" id = "przycisk_wróć">
+                        Wróć
+                    </button>
+                </div>
+
+        </div>
+
+        <script src = "./quiz.js" id = "quiz_script"></script>
+    </body>
+</html>
