@@ -18,20 +18,51 @@ function yearAfterDate() : string {
     return [year, month, day].join('-');
 }
 
-describe('test1', function () {
-    it('Reset', async function() {
+async function set_element_with_clear(element_name : string, value : string) : Promise<void> {
+    const element = await driver.find(element_name);
+    await element.clear();
+    await element.sendKeys(value);
+}
+
+async function set_select_element(element_name : string, value : string) : Promise<void> {
+    const element = await driver.find(element_name);
+    const option = element.find("option[value=" + value + "]");
+    (await option).click();
+}
+
+async function input_data() : Promise<void> {
+    await set_element_with_clear('input[name=Imię]', 'Jan');
+    await set_element_with_clear('input[name=Nazwisko]', 'Woreczko');
+    await set_select_element('select[id=Skąd]', 'Warszawa');
+    await set_select_element('select[id=Dokąd]', 'Londyn');
+    await set_element_with_clear('input[name=data]', yearAfterDate());
+}
+
+async function check_selected(element_name : string) {
+    expect(await (await driver.find(element_name)).isSelected()).to.be.true;
+}
+
+async function check_equal(element_name : string, value : string) {
+    expect(await driver.find(element_name).getText()).equal(value);
+}
+
+describe('Przycisk "reset"', function () {
+    it('Resetowanie', async function() {
         this.timeout(20000);
         await driver.get(filePath);
         
-        expect(await driver.find('select[id=Dokąd]').getText()).to.include('Warszawa');
-        await driver.find('input[name=Imię]').sendKeys('Jan');
-        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
+        await input_data();
         await driver.find('input[type=reset]').doClick();
+
+        await check_equal('input[name=Imię]', '');
+        await check_selected('option[value=Warszawa]');
+        await check_selected('option[value=Warszawa]');
+        await check_equal('input[name=data]', '');
     });
 })
 
-describe('test2', function () {
-    it('Submit', async function() {
+describe('Przycisk "submit"', function () {
+    it('Chowanie przycisku wysyłania', async function() {
         this.timeout(20000);
         await driver.get(filePath);
         await driver.find('input[type=submit]');
@@ -45,61 +76,50 @@ describe('test2', function () {
         }
         expect(clickable).to.be.false;
 
-        await driver.find('input[type=reset]').doClick();
-        await driver.find('input[name=Imię]').sendKeys('Jan');
-        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
-        await driver.find('select[id=Skąd]').sendKeys('Warszawa');
-        await driver.find('select[id=Dokąd]').sendKeys('Londyn');
-        await driver.find('input[name=data]').sendKeys(yearAfterDate());
+        await input_data();
         await driver.find('input[type=submit]').doClick();
     });
 })
 
-describe('test3', function () {
-    it('Zasłona', async function() {
+describe('Rezerwacja', function () {
+    it('Wyświetlanie potwierdzenia rezerwacji i poprawność danych tam zawartych',
+            async function() {
         const date = yearAfterDate();
 
         this.timeout(20000);
         await driver.get(filePath);
-        await driver.find('input[type=reset]').doClick();
 
-        await driver.find('input[name=Imię]').sendKeys('Jan');
-        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
-        await driver.find('select[id=Skąd]').sendKeys('Warszawa');
-        await driver.find('select[id=Dokąd]').sendKeys('Londyn');
-        await driver.find('input[name=data]').sendKeys(date);
+        await input_data();
         await driver.find('input[type=submit]').doClick();
 
         await driver.find('div[class=zaslona]');
-        expect (await driver.find('p[id=zaslona_gratulacje]').getText()).equal('Udana rezerwacja!');
-        expect (await driver.find('p[id=zaslona_miasto_odlotu]').getText()).equal('Lot z: ' + 'Warszawa');
-        expect (await driver.find('p[id=zaslona_miasto_przylotu]').getText()).equal('Lot do: ' + 'Londyn');
-        expect (await driver.find('p[id=zaslona_data_lotu]').getText()).equal('Data lotu: ' + date);
-        expect (await driver.find('p[id=zaslona_imię]').getText()).equal('Imię: ' + 'Jan');
-        expect (await driver.find('p[id=zaslona_nazwisko]').getText()).equal('Nazwisko: ' + 'Woreczko');
+        expect (await driver.find('p[id=zaslona_gratulacje]').getText()).equal
+                ('Udana rezerwacja!');
+        expect (await driver.find('p[id=zaslona_miasto_odlotu]').getText()).equal
+                ('Lot z: ' + 'Warszawa');
+        expect (await driver.find('p[id=zaslona_miasto_przylotu]').getText()).equal
+                ('Lot do: ' + 'Londyn');
+        expect (await driver.find('p[id=zaslona_data_lotu]').getText()).equal
+                ('Data lotu: ' + date);
+        expect (await driver.find('p[id=zaslona_imię]').getText()).equal
+                ('Imię: ' + 'Jan');
+        expect (await driver.find('p[id=zaslona_nazwisko]').getText()).equal
+                ('Nazwisko: ' + 'Woreczko');
 
     });
 })
 
-describe('test4', function () {
-    it('Linki', async function() {
-        const date = yearAfterDate();
-
+describe('Zasłanianie linków', function () {
+    it('Sprawdzenie, że podczas wyświetlania potwierdzenia nie można klikać w linki',
+            async function() {
         this.timeout(20000);
         await driver.get(filePath);
-        await driver.find('input[type=reset]').doClick();
 
-        await driver.find('input[name=Imię]').sendKeys('Jan');
-        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
-        await driver.find('select[id=Skąd]').sendKeys('Warszawa');
-        await driver.find('select[id=Dokąd]').sendKeys('Londyn');
-        await driver.find('input[name=data]').sendKeys(date);
-        await driver.find('input[type=submit]').doClick();
+        await input_data();
 
         await driver.find('div[class=zaslona]');
 
-        let i;
-        for (i = 1; i <= 8; i++) {
+        for (let i = 1; i <= 8; i++) {
             let clickable : boolean = true;
             try {
                 await driver.find('a[id=menu_link' + i.toString() + ']').doClick();
@@ -107,6 +127,7 @@ describe('test4', function () {
             catch (e) {
                 clickable = false;
             }
+
             expect(clickable).to.be.false;
         }
 

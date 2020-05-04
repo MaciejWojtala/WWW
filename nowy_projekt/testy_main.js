@@ -50,218 +50,210 @@ function yearAfterDate() {
         day = '0' + day;
     return [year, month, day].join('-');
 }
+function set_element_with_clear(element_name, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        var element;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, mocha_webdriver_1.driver.find(element_name)];
+                case 1:
+                    element = _a.sent();
+                    return [4 /*yield*/, element.clear()];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, element.sendKeys(value)];
+                case 3:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function set_select_element(element_name, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        var element, option;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, mocha_webdriver_1.driver.find(element_name)];
+                case 1:
+                    element = _a.sent();
+                    option = element.find("option[value=" + value + "]");
+                    return [4 /*yield*/, option];
+                case 2:
+                    (_a.sent()).click();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function input_data() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, set_element_with_clear('input[name=Imię]', 'Jan')];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, set_element_with_clear('input[name=Nazwisko]', 'Woreczko')];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, set_select_element('select[id=Skąd]', 'Warszawa')];
+                case 3:
+                    _a.sent();
+                    return [4 /*yield*/, set_select_element('select[id=Dokąd]', 'Londyn')];
+                case 4:
+                    _a.sent();
+                    return [4 /*yield*/, set_element_with_clear('input[name=data]', yearAfterDate())];
+                case 5:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function check_selected(element_name, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _a = chai_1.expect;
+                    return [4 /*yield*/, mocha_webdriver_1.driver.find(element_name)];
+                case 1: return [4 /*yield*/, (_b.sent()).isSelected()];
+                case 2:
+                    _a.apply(void 0, [_b.sent()]).to.be["true"];
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function check_equal(element_name, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _a = chai_1.expect;
+                    return [4 /*yield*/, mocha_webdriver_1.driver.find(element_name).getText()];
+                case 1:
+                    _a.apply(void 0, [_b.sent()]).equal(value);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 describe('test1', function () {
-    it('Reset', function () {
+    it('Resetowanie', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         this.timeout(20000);
                         return [4 /*yield*/, mocha_webdriver_1.driver.get(filePath)];
                     case 1:
-                        _b.sent();
-                        _a = chai_1.expect;
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Dokąd]').getText()];
-                    case 2:
-                        _a.apply(void 0, [_b.sent()]).to.include('Warszawa');
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Imię]').sendKeys('Jan')];
-                    case 3:
-                        _b.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Nazwisko]').sendKeys('Woreczko')];
-                    case 4:
-                        _b.sent();
+                        _a.sent();
+                        //await input_data();
                         return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=reset]').doClick()];
+                    case 2:
+                        //await input_data();
+                        _a.sent();
+                        return [4 /*yield*/, check_equal('input[name=Imię]', '')];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, check_selected('select[id=Skąd]', 'Warszawa')];
+                    case 4:
+                        _a.sent();
+                        return [4 /*yield*/, check_selected('select[id=Dokąd]', 'Warszawa')];
                     case 5:
-                        _b.sent();
+                        _a.sent();
+                        return [4 /*yield*/, check_equal('input[name=data]', '')];
+                    case 6:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
         });
     });
 });
+/*
 describe('test2', function () {
-    it('Submit', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var clickable, e_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        this.timeout(20000);
-                        return [4 /*yield*/, mocha_webdriver_1.driver.get(filePath)];
-                    case 1:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]')];
-                    case 2:
-                        _a.sent();
-                        clickable = true;
-                        _a.label = 3;
-                    case 3:
-                        _a.trys.push([3, 5, , 6]);
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]').doClick()];
-                    case 4:
-                        _a.sent();
-                        return [3 /*break*/, 6];
-                    case 5:
-                        e_1 = _a.sent();
-                        clickable = false;
-                        return [3 /*break*/, 6];
-                    case 6:
-                        chai_1.expect(clickable).to.be["false"];
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=reset]').doClick()];
-                    case 7:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Imię]').sendKeys('Jan')];
-                    case 8:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Nazwisko]').sendKeys('Woreczko')];
-                    case 9:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Skąd]').sendKeys('Warszawa')];
-                    case 10:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Dokąd]').sendKeys('Londyn')];
-                    case 11:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=data]').sendKeys(yearAfterDate())];
-                    case 12:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]').doClick()];
-                    case 13:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
+    it('Submit', async function() {
+        this.timeout(20000);
+        await driver.get(filePath);
+        await driver.find('input[type=submit]');
+
+        let clickable : boolean = true;
+        try {
+            await driver.find('input[type=submit]').doClick();
+        }
+        catch (e) {
+            clickable = false;
+        }
+        expect(clickable).to.be.false;
+
+        await driver.find('input[type=reset]').doClick();
+        await driver.find('input[name=Imię]').sendKeys('Jan');
+        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
+        await driver.find('select[id=Skąd]').sendKeys('Warszawa');
+        await driver.find('select[id=Dokąd]').sendKeys('Londyn');
+        await driver.find('input[name=data]').sendKeys(yearAfterDate());
+        await driver.find('input[type=submit]').doClick();
     });
-});
+})
+
 describe('test3', function () {
-    it('Zasłona', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var date, _a, _b, _c, _d, _e, _f;
-            return __generator(this, function (_g) {
-                switch (_g.label) {
-                    case 0:
-                        date = yearAfterDate();
-                        this.timeout(20000);
-                        return [4 /*yield*/, mocha_webdriver_1.driver.get(filePath)];
-                    case 1:
-                        _g.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=reset]').doClick()];
-                    case 2:
-                        _g.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Imię]').sendKeys('Jan')];
-                    case 3:
-                        _g.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Nazwisko]').sendKeys('Woreczko')];
-                    case 4:
-                        _g.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Skąd]').sendKeys('Warszawa')];
-                    case 5:
-                        _g.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Dokąd]').sendKeys('Londyn')];
-                    case 6:
-                        _g.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=data]').sendKeys(date)];
-                    case 7:
-                        _g.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]').doClick()];
-                    case 8:
-                        _g.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('div[class=zaslona]')];
-                    case 9:
-                        _g.sent();
-                        _a = chai_1.expect;
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('p[id=zaslona_gratulacje]').getText()];
-                    case 10:
-                        _a.apply(void 0, [_g.sent()]).equal('Udana rezerwacja!');
-                        _b = chai_1.expect;
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('p[id=zaslona_miasto_odlotu]').getText()];
-                    case 11:
-                        _b.apply(void 0, [_g.sent()]).equal('Lot z: ' + 'Warszawa');
-                        _c = chai_1.expect;
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('p[id=zaslona_miasto_przylotu]').getText()];
-                    case 12:
-                        _c.apply(void 0, [_g.sent()]).equal('Lot do: ' + 'Londyn');
-                        _d = chai_1.expect;
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('p[id=zaslona_data_lotu]').getText()];
-                    case 13:
-                        _d.apply(void 0, [_g.sent()]).equal('Data lotu: ' + date);
-                        _e = chai_1.expect;
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('p[id=zaslona_imię]').getText()];
-                    case 14:
-                        _e.apply(void 0, [_g.sent()]).equal('Imię: ' + 'Jan');
-                        _f = chai_1.expect;
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('p[id=zaslona_nazwisko]').getText()];
-                    case 15:
-                        _f.apply(void 0, [_g.sent()]).equal('Nazwisko: ' + 'Woreczko');
-                        return [2 /*return*/];
-                }
-            });
-        });
+    it('Zasłona', async function() {
+        const date = yearAfterDate();
+
+        this.timeout(20000);
+        await driver.get(filePath);
+        await driver.find('input[type=reset]').doClick();
+
+        await driver.find('input[name=Imię]').sendKeys('Jan');
+        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
+        await driver.find('select[id=Skąd]').sendKeys('Warszawa');
+        await driver.find('select[id=Dokąd]').sendKeys('Londyn');
+        await driver.find('input[name=data]').sendKeys(date);
+        await driver.find('input[type=submit]').doClick();
+
+        await driver.find('div[class=zaslona]');
+        expect (await driver.find('p[id=zaslona_gratulacje]').getText()).equal('Udana rezerwacja!');
+        expect (await driver.find('p[id=zaslona_miasto_odlotu]').getText()).equal('Lot z: ' + 'Warszawa');
+        expect (await driver.find('p[id=zaslona_miasto_przylotu]').getText()).equal('Lot do: ' + 'Londyn');
+        expect (await driver.find('p[id=zaslona_data_lotu]').getText()).equal('Data lotu: ' + date);
+        expect (await driver.find('p[id=zaslona_imię]').getText()).equal('Imię: ' + 'Jan');
+        expect (await driver.find('p[id=zaslona_nazwisko]').getText()).equal('Nazwisko: ' + 'Woreczko');
+
     });
-});
+})
+
 describe('test4', function () {
-    it('Linki', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var date, i, clickable, e_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        date = yearAfterDate();
-                        this.timeout(20000);
-                        return [4 /*yield*/, mocha_webdriver_1.driver.get(filePath)];
-                    case 1:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=reset]').doClick()];
-                    case 2:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Imię]').sendKeys('Jan')];
-                    case 3:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Nazwisko]').sendKeys('Woreczko')];
-                    case 4:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Skąd]').sendKeys('Warszawa')];
-                    case 5:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Dokąd]').sendKeys('Londyn')];
-                    case 6:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=data]').sendKeys(date)];
-                    case 7:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]').doClick()];
-                    case 8:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('div[class=zaslona]')];
-                    case 9:
-                        _a.sent();
-                        i = 1;
-                        _a.label = 10;
-                    case 10:
-                        if (!(i <= 8)) return [3 /*break*/, 16];
-                        clickable = true;
-                        _a.label = 11;
-                    case 11:
-                        _a.trys.push([11, 13, , 14]);
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('a[id=menu_link' + i.toString() + ']').doClick()];
-                    case 12:
-                        _a.sent();
-                        return [3 /*break*/, 14];
-                    case 13:
-                        e_2 = _a.sent();
-                        clickable = false;
-                        return [3 /*break*/, 14];
-                    case 14:
-                        chai_1.expect(clickable).to.be["false"];
-                        _a.label = 15;
-                    case 15:
-                        i++;
-                        return [3 /*break*/, 10];
-                    case 16: return [2 /*return*/];
-                }
-            });
-        });
+    it('Linki', async function() {
+        const date = yearAfterDate();
+
+        this.timeout(20000);
+        await driver.get(filePath);
+        await driver.find('input[type=reset]').doClick();
+
+        await driver.find('input[name=Imię]').sendKeys('Jan');
+        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
+        await driver.find('select[id=Skąd]').sendKeys('Warszawa');
+        await driver.find('select[id=Dokąd]').sendKeys('Londyn');
+        await driver.find('input[name=data]').sendKeys(date);
+        await driver.find('input[type=submit]').doClick();
+
+        await driver.find('div[class=zaslona]');
+
+        for (let i = 1; i <= 8; i++) {
+            let clickable : boolean = true;
+            try {
+                await driver.find('a[id=menu_link' + i.toString() + ']').doClick();
+            }
+            catch (e) {
+                clickable = false;
+            }
+            expect(clickable).to.be.false;
+        }
+
     });
-});
+})
+*/
