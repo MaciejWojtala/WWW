@@ -183,7 +183,7 @@
             scoring_system.textContent = scoring_text +
                     (local_question_number * 10).toString() + " sekund.";
             grid_questions_number.style.display = "block";
-            questions_number.textContent = "Test zawiera " + quiz.questions.length + " pytań";
+            questions_number.textContent = "Test zawiera " + quiz.questions.length + " zadań.";
             grid_question.style.display = "block";
             question.textContent = quiz.questions[local_question_number - 1];
             header.textContent = "Zadanie " + question_number.toString();
