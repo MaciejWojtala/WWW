@@ -38,136 +38,327 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var chai_1 = require("chai");
 var mocha_webdriver_1 = require("mocha-webdriver");
-function yearAfterDate() {
+var filePath = 'file://' + process.cwd() + '/Loty.html';
+function yearDifferentDate(difference) {
     var d = new Date();
     var month = (d.getMonth() + 1).toString();
     var day = d.getDate().toString();
-    var year = (d.getFullYear() + 1).toString();
+    var year = (d.getFullYear() + difference).toString();
     if (month.length < 2)
         month = '0' + month;
     if (day.length < 2)
         day = '0' + day;
     return [year, month, day].join('-');
 }
-/*describe('test1', function () {
-    it('Reset', async function() {
-        this.timeout(20000);
-        await driver.get('file:///C:/Users/macie/Desktop/Studia/WWW/nowy_projekt/Loty.html');
-
-        expect(await driver.find('select[id=Dokąd]').getText()).to.include('Warszawa');
-        await driver.find('input[name=Imię]').sendKeys('Jan');
-        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
-        await driver.find('input[type=reset]').doClick();
+function yearAfterDate() {
+    return yearDifferentDate(1);
+}
+function yearBeforeDate() {
+    return yearDifferentDate(-1);
+}
+function set_element_with_clear(element_name, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        var element;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, mocha_webdriver_1.driver.find(element_name)];
+                case 1:
+                    element = _a.sent();
+                    return [4 /*yield*/, element.clear()];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, element.sendKeys(value)];
+                case 3:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
     });
-})*/
-/*describe('test2', function () {
-    it('Submit', async function() {
-        this.timeout(20000);
-        await driver.get('file:///C:/Users/macie/Desktop/Studia/WWW/nowy_projekt/Loty.html');
-        await driver.find('input[type=submit]');
-
-        let clickable : boolean = true;
-        try {
-            await driver.find('input[type=submit]').doClick();
-        }
-        catch (e) {
-            clickable = false;
-        }
-        expect(clickable).to.be.false;
-
-        await driver.find('input[type=reset]').doClick();
-        await driver.find('input[name=Imię]').sendKeys('Jan');
-        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
-        await driver.find('select[id=Skąd]').sendKeys('Warszawa');
-        await driver.find('select[id=Dokąd]').sendKeys('Londyn');
-        await driver.find('input[name=data]').sendKeys(yearAfterDate());
-        await driver.find('input[type=submit]').doClick();
+}
+function clear_element(element_name) {
+    return __awaiter(this, void 0, void 0, function () {
+        var element;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, mocha_webdriver_1.driver.find(element_name)];
+                case 1:
+                    element = _a.sent();
+                    return [4 /*yield*/, element.clear()];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
     });
-})*/
-/*describe('test3', function () {
-    it('Zasłona', async function() {
-        const date = yearAfterDate();
-
-        this.timeout(20000);
-        await driver.get('file:///C:/Users/macie/Desktop/Studia/WWW/nowy_projekt/Loty.html');
-        await driver.find('input[type=reset]').doClick();
-
-        await driver.find('input[name=Imię]').sendKeys('Jan');
-        await driver.find('input[name=Nazwisko]').sendKeys('Woreczko');
-        await driver.find('select[id=Skąd]').sendKeys('Warszawa');
-        await driver.find('select[id=Dokąd]').sendKeys('Londyn');
-        await driver.find('input[name=data]').sendKeys(date);
-        await driver.find('input[type=submit]').doClick();
-
-        await driver.find('div[class=zaslona]');
-        expect (await driver.find('p[id=zaslona_gratulacje]').getText()).equal('Udana rezerwacja!');
-        expect (await driver.find('p[id=zaslona_miasto_odlotu]').getText()).equal('Lot z: ' + 'Warszawa');
-        expect (await driver.find('p[id=zaslona_miasto_przylotu]').getText()).equal('Lot do: ' + 'Londyn');
-        expect (await driver.find('p[id=zaslona_data_lotu]').getText()).equal('Data lotu: ' + date);
-        expect (await driver.find('p[id=zaslona_imię]').getText()).equal('Imię: ' + 'Jan');
-        expect (await driver.find('p[id=zaslona_nazwisko]').getText()).equal('Nazwisko: ' + 'Woreczko');
-
+}
+function set_select_element(element_name, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        var element, option;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, mocha_webdriver_1.driver.find(element_name)];
+                case 1:
+                    element = _a.sent();
+                    option = element.find("option[value=" + value + "]");
+                    return [4 /*yield*/, option];
+                case 2:
+                    (_a.sent()).click();
+                    return [2 /*return*/];
+            }
+        });
     });
-})*/
-describe('test4', function () {
-    it('Linki', function () {
+}
+function input_data() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, set_element_with_clear('input[name=Imię]', 'Jan')];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, set_element_with_clear('input[name=Nazwisko]', 'Woreczko')];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, set_select_element('select[id=Skąd]', 'Warszawa')];
+                case 3:
+                    _a.sent();
+                    return [4 /*yield*/, set_select_element('select[id=Dokąd]', 'Londyn')];
+                case 4:
+                    _a.sent();
+                    return [4 /*yield*/, set_element_with_clear('input[name=data]', yearAfterDate())];
+                case 5:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function check_equal(element_name, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _a = chai_1.expect;
+                    return [4 /*yield*/, mocha_webdriver_1.driver.find(element_name).getText()];
+                case 1:
+                    _a.apply(void 0, [_b.sent()]).equal(value);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function get_curtain() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, mocha_webdriver_1.driver.get(filePath)];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, input_data()];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]').doClick()];
+                case 3:
+                    _a.sent();
+                    return [4 /*yield*/, mocha_webdriver_1.driver.find('div[class=zaslona]')];
+                case 4:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function check_unclickable() {
+    return __awaiter(this, void 0, void 0, function () {
+        var clickable, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    clickable = true;
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]').doClick()];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_1 = _a.sent();
+                    clickable = false;
+                    return [3 /*break*/, 4];
+                case 4:
+                    chai_1.expect(clickable).to.be["false"];
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function set_wrong(selector, wrong_value) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, input_data()];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, set_element_with_clear(selector, wrong_value)];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, check_equal(selector, '')];
+                case 3:
+                    _a.sent();
+                    return [4 /*yield*/, check_unclickable()];
+                case 4:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function set_empty(selector) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, input_data()];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, clear_element(selector)];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+describe('Przycisk "submit"', function () {
+    it('Chowanie przycisku wysyłania', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var date, i, clickable, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.timeout(20000);
+                        return [4 /*yield*/, mocha_webdriver_1.driver.get(filePath)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]')];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, set_empty('input[name=Imię]')];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, set_empty('input[name=Nazwisko]')];
+                    case 4:
+                        _a.sent();
+                        return [4 /*yield*/, input_data()];
+                    case 5:
+                        _a.sent();
+                        return [4 /*yield*/, set_select_element('select[id=Skąd]', 'Londyn')];
+                    case 6:
+                        _a.sent();
+                        return [4 /*yield*/, set_select_element('select[id=Dokąd]', 'Londyn')];
+                    case 7:
+                        _a.sent();
+                        return [4 /*yield*/, check_unclickable()];
+                    case 8:
+                        _a.sent();
+                        return [4 /*yield*/, set_wrong('input[name=data]', yearBeforeDate())];
+                    case 9:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('Pokazywanie przycisku wysyłania', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.timeout(20000);
+                        return [4 /*yield*/, mocha_webdriver_1.driver.get(filePath)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, input_data()];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]').doClick()];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+});
+describe('Rezerwacja', function () {
+    it('Wyświetlanie potwierdzenia rezerwacji i poprawność danych tam zawartych', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var date;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         date = yearAfterDate();
                         this.timeout(20000);
-                        return [4 /*yield*/, mocha_webdriver_1.driver.get('file:///C:/Users/macie/Desktop/Studia/WWW/nowy_projekt/Loty.html')];
+                        return [4 /*yield*/, get_curtain()];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=reset]').doClick()];
+                        return [4 /*yield*/, check_equal('p[id=zaslona_gratulacje]', 'Udana rezerwacja!')];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Imię]').sendKeys('Jan')];
+                        return [4 /*yield*/, check_equal('p[id=zaslona_miasto_odlotu]', 'Lot z: ' + 'Warszawa')];
                     case 3:
                         _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=Nazwisko]').sendKeys('Woreczko')];
+                        return [4 /*yield*/, check_equal('p[id=zaslona_miasto_przylotu]', 'Lot do: ' + 'Londyn')];
                     case 4:
                         _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Skąd]').sendKeys('Warszawa')];
+                        return [4 /*yield*/, check_equal('p[id=zaslona_data_lotu]', 'Data lotu: ' + date)];
                     case 5:
                         _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('select[id=Dokąd]').sendKeys('Londyn')];
+                        return [4 /*yield*/, check_equal('p[id=zaslona_imię]', 'Imię: ' + 'Jan')];
                     case 6:
                         _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[name=data]').sendKeys(date)];
+                        return [4 /*yield*/, check_equal('p[id=zaslona_nazwisko]', 'Nazwisko: ' + 'Woreczko')];
                     case 7:
                         _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('input[type=submit]').doClick()];
-                    case 8:
-                        _a.sent();
-                        return [4 /*yield*/, mocha_webdriver_1.driver.find('div[class=zaslona]')];
-                    case 9:
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+});
+describe('Zasłanianie linków', function () {
+    it('Sprawdzenie, że podczas wyświetlania potwierdzenia nie można klikać w linki', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var i, clickable, e_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.timeout(20000);
+                        return [4 /*yield*/, get_curtain()];
+                    case 1:
                         _a.sent();
                         i = 1;
-                        _a.label = 10;
-                    case 10:
-                        if (!(i <= 8)) return [3 /*break*/, 16];
+                        _a.label = 2;
+                    case 2:
+                        if (!(i <= 8)) return [3 /*break*/, 8];
                         clickable = true;
-                        _a.label = 11;
-                    case 11:
-                        _a.trys.push([11, 13, , 14]);
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
                         return [4 /*yield*/, mocha_webdriver_1.driver.find('a[id=menu_link' + i.toString() + ']').doClick()];
-                    case 12:
+                    case 4:
                         _a.sent();
-                        return [3 /*break*/, 14];
-                    case 13:
-                        e_1 = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        e_2 = _a.sent();
                         clickable = false;
-                        return [3 /*break*/, 14];
-                    case 14:
+                        return [3 /*break*/, 6];
+                    case 6:
                         chai_1.expect(clickable).to.be["false"];
-                        _a.label = 15;
-                    case 15:
+                        _a.label = 7;
+                    case 7:
                         i++;
-                        return [3 /*break*/, 10];
-                    case 16: return [2 /*return*/];
+                        return [3 /*break*/, 2];
+                    case 8: return [2 /*return*/];
                 }
             });
         });
