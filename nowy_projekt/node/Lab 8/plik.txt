@@ -1,0 +1,4 @@
+Kolejny wpis do pliku!
+Kolejny wpis do pliku!
+A z promisami też się może zapisze?
+A z promisami też się może zapisze?
