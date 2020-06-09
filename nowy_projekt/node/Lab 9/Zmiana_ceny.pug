@@ -1,0 +1,25 @@
+html
+    head
+        title= title
+    style
+        include Memy.css
+    body
+        h1= message
+
+        form(action = "/meme/" + meme.id + "/submit-form" method = "POST")
+            label New price: 
+            input(type="number" name="price" class="write")
+            input(type="reset" value="Clear" class="click")
+            input(type="submit" value="Send" class="click")
+
+        table
+            thead
+                tr
+                    th Numer generacji
+                    each price, index in meme.history
+                        th #{index + 1}
+            tbody
+                tr
+                    td Cena
+                    each price in meme.history
+                        td #{price}
