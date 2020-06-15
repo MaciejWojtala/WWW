@@ -2,7 +2,6 @@
 exports.__esModule = true;
 exports.anyToNumber = void 0;
 function anyToNumber(arg) {
-    console.log(arg);
     try {
         var result = Number(arg);
         if (!Number.isNaN(result))

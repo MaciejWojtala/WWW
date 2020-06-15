@@ -1,5 +1,4 @@
 export function anyToNumber(arg : any) : [number, boolean] {
-    console.log(arg);
     try {
         const result = Number(arg);
         if (!Number.isNaN(result))
