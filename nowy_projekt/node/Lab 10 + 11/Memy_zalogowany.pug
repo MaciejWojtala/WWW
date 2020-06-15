@@ -1,0 +1,18 @@
+html
+    head
+        title= title
+    style
+        include Memy.css
+    body
+        h1= message
+        img(src="https://i.imgflip.com/421vgp.jpg" id="top")
+        h1="Meme list"
+        ul
+            each meme in memes
+                li
+                   a(href="meme/" + meme.id) #{meme.name}
+                   p Price: #{meme.price}
+                   img(src=meme.url)
+        form(action = "/" method = "POST")
+            input(type="submit" value="Logout" name="Logout" class="click")
+            input(type="hidden" name="_csrf" value=req.csrfToken())
