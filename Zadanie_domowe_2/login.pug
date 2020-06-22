@@ -1,0 +1,14 @@
+html
+    head
+        title= title
+    style
+        include quiz.css
+    body
+        h1= _message
+        form(action = "/" method = "POST" class = "login")
+            label(class = "login") Nazwa użytkownika: 
+            input(type="text" name = "username" class = "write_login" class = "login")
+            label(class = "login") Hasło: 
+            input(type = "text" name = "password" class = "write_login" class = "login")
+            input(type = "submit" name = "login_send" value = "Zaloguj" class = "click_login" class = "login")
+            input(type = "hidden" name = "_csrf" value = _req.csrfToken())

@@ -1,0 +1,122 @@
+html(lang='pl-PL')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title Statystyki
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', type='text/css', media='screen', href='./quiz.css')
+  body
+    h1(id='tytuł_strony') Statystyki
+    #grid_tabela_najlepsze_wyniki
+        table#tabela_najlepsze_wyniki
+          thead(id='tabela_najlepsze_wyniki_nagłówek')
+            tr(id='tabela_podsumowanie_nagłówek_wiersz')
+              th(class='tabela_najlepsze_wyniki_nagłówek_kolumna1')
+                | Zak
+                wbr 
+                | res
+              th(class='tabela_najlepsze_wyniki_nagłówek_kolumna1')
+                | 1. wy
+                wbr
+                | nik
+              th(class='tabela_najlepsze_wyniki_nagłówek_kolumna1')
+                | 2. wy
+                wbr 
+                | nik
+              th(class='tabela_najlepsze_wyniki_nagłówek_kolumna1')
+                | 3. wy
+                wbr 
+                | nik
+              th(class='tabela_najlepsze_wyniki_nagłówek_kolumna1')
+                | 4. wy
+                wbr 
+                | nik
+              th(class='tabela_najlepsze_wyniki_nagłówek_kolumna1')
+                | 5. wy
+                wbr
+                | nik
+              th(class='tabela_najlepsze_wyniki_nagłówek_kolumna1')
+                | Śred
+                wbr
+                | ni 
+                wbr
+                | czas 
+                | dob
+                wbr 
+                | rej 
+                wbr 
+                | od
+                wbr 
+                | po
+                wbr 
+                | wie
+                wbr 
+                | dzi
+          tbody(id='tabela_najlepsze_wyniki_zawartość')
+            tr#tabela_najlepsze_wyniki_wiersz1
+              td.tabela_najlepsze_wyniki_kolumna1
+                | Zadanie 1
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[0][0]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[0][1]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[0][2]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[0][3]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[0][4]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.avg[0]
+            tr#tabela_najlepsze_wyniki_wiersz2
+              td.tabela_najlepsze_wyniki_kolumna1
+                | Zadanie 2
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[1][0]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[1][1]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[1][2]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[1][3]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[1][4]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.avg[1]
+            tr#tabela_najlepsze_wyniki_wiersz3
+              td.tabela_najlepsze_wyniki_kolumna1
+                | Zadanie 3
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[2][0]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[2][1]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[2][2]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[2][3]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[2][4]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.avg[2]
+            tr#tabela_najlepsze_wyniki_wiersz4
+              td.tabela_najlepsze_wyniki_kolumna1
+                | Zadanie 4
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[3][0]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[3][1]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[3][2]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[3][3]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[3][4]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.avg[3]
+            tr#tabela_najlepsze_wyniki_wiersz5
+              td.tabela_najlepsze_wyniki_kolumna1
+                | Zadanie 5
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[4][0]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[4][1]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[4][2]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[4][3]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[4][4]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.avg[4]
+            tr#tabela_najlepsze_wyniki_wiersz5
+              td.tabela_najlepsze_wyniki_kolumna1
+                | Zadanie 6
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[5][0]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[5][1]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[5][2]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[5][3]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[5][4]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.avg[5]
+            tr#tabela_najlepsze_wyniki_wiersz5
+              td.tabela_najlepsze_wyniki_kolumna1
+                | Sumarycznie
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[6][0]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[6][1]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[6][2]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[6][3]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.bests[6][4]
+              td.tabela_najlepsze_wyniki_kolumna2= _result.avg[6]
+    form(action = "/" method = "POST")
+      .grid_przyciski_startowe
+        input(type = 'submit' name = 'comeback_stats' value = 'Wróć' class = 'wybierz_quiz')
+        input(type = "hidden" name = "_csrf" value = _req.csrfToken())

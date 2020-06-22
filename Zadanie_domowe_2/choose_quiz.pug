@@ -1,0 +1,23 @@
+html(lang='pl-PL')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title Wybór quizu
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', type='text/css', media='screen', href='./quiz.css')
+  body
+    h1(id='tytuł_strony') Wybierz quiz
+      form(action = "/" method = "POST")
+        .grid_przyciski_startowe
+          input(type = 'submit' name = 'quiz' value = quizzes[0] class = 'wybierz_quiz' class = 'wybierz_quiz_pierwszy')
+        .grid_przyciski_startowe
+          input(type = 'submit' name = 'quiz' value = quizzes[1] class = 'wybierz_quiz')
+        .grid_przyciski_startowe
+          input(type = 'submit' name = 'quiz' value = quizzes[2] class = 'wybierz_quiz')
+        .grid_przyciski_startowe
+          input(type = 'submit' name = 'quiz' value = quizzes[3] class = 'wybierz_quiz')
+        .grid_przyciski_startowe
+          input(type = 'submit' name = 'logout' value = 'Wyloguj' class = 'wybierz_quiz' class = 'logout')
+        .grid_przyciski_startowe
+          input(type = 'submit' name = 'change_password' value = 'Zmień hasło' class = 'wybierz_quiz')
+          input(type = "hidden" name = "_csrf" value = _req.csrfToken())

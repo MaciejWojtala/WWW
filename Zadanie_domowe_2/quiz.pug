@@ -1,0 +1,179 @@
+html(lang='pl-PL')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title Quiz
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', type='text/css', media='screen', href='./quiz.css')
+  body
+    h1(id='tytuł_strony') Quiz
+    div(id='grid_ogólny')
+      div(id='grid_wstęp')
+        h2(id='wstęp_nagłówek') Wstęp
+        article(id='wstęp')
+      .grid_pytanie(id='grid_pytanie 1')
+        h3(id='pytanie_nagłówek 1', class='pytanie_nagłówek')
+        form.formularz_odpowiedzi(action='*', id='formularz_odpowiedzi 1')
+          label.pytanie(id='pytanie 1')
+          input(type='number', name='odpowiedź', class='odpowiedź', id='odpowiedź 1')
+      .grid_pytanie(id='grid_pytanie 2')
+        h3(id='pytanie_nagłówek 2', class='pytanie_nagłówek')
+        form.formularz_odpowiedzi(action='*', id='formularz_odpowiedzi 2')
+          label.pytanie(id='pytanie 2')
+          input(type='number', name='odpowiedź', class='odpowiedź', id='odpowiedź 2')
+      .grid_pytanie(id='grid_pytanie 3')
+        h3(id='pytanie_nagłówek 3', class='pytanie_nagłówek')
+        form.formularz_odpowiedzi(action='*', id='formularz_odpowiedzi 3')
+          label.pytanie(id='pytanie 3')
+          input(type='number', name='odpowiedź', class='odpowiedź', id='odpowiedź 3')
+      .grid_pytanie(id='grid_pytanie 4')
+        form.formularz_odpowiedzi(action='*', id='formularz_odpowiedzi 4')
+          h3(id='pytanie_nagłówek 4', class='pytanie_nagłówek')
+          label.pytanie(id='pytanie 4')
+          input(type='number', name='odpowiedź', class='odpowiedź', id='odpowiedź 4')
+      .grid_pytanie(id='grid_pytanie 5')
+        form.formularz_odpowiedzi(action='*', id='formularz_odpowiedzi 5')
+          h3(id='pytanie_nagłówek 5', class='pytanie_nagłówek')
+          label.pytanie(id='pytanie 5')
+          input(type='number', name='odpowiedź', class='odpowiedź', id='odpowiedź 5')
+      .grid_pytanie(id='grid_pytanie 6')
+        form.formularz_odpowiedzi(action='*', id='formularz_odpowiedzi 6')
+          h3(id='pytanie_nagłówek 6', class='pytanie_nagłówek')
+          label.pytanie(id='pytanie 6')
+          input(type='number', name='odpowiedź', class='odpowiedź', id='odpowiedź 6')
+      #grid_przyciski_zmiana_pytania
+        button#poprzednie_pytanie(type='button', class='przycisk_przejścia')
+          | Poprzednie zadanie
+        button(type='button', id='następne_pytanie', class='przycisk_przejścia')
+          | Następne zadanie
+      div(id='grid_przycisk_zakończenie_quizu')
+        button(type='button', id='zakończ_quiz', class='przycisk_zakończenia')
+          | Zakończ quiz
+      #grid_przycisk_anulowanie_quizu
+        form(action = "/" method = "POST")
+          input(type = 'submit' name = 'cancel_quiz' value = 'Anuluj quiz' id = 'anuluj_quiz' class = 'wybierz_quiz' class = 'wysokie_urządzenia')
+          input(type = "hidden" name = "_csrf" value = _req.csrfToken())
+        .grid_przyciski_startowe
+      #grid_czas
+        h2(id='czas_nagłówek', class='wysokie_urządzenia') Czas
+        article#czas(class='wysokie_urządzenia')
+      #grid_punktacja
+        h2(id='punktacja_nagłówek', class='wysokie_urządzenia')
+          | Punktacja
+        article#punktacja(class='wysokie_urządzenia')
+      div(id='grid_liczba_pytań')
+        h2(id='liczba_pytań_nagłówek', class='wysokie_urządzenia')
+          | Informacje dodatkowe
+        article(id='liczba_pytań', class='wysokie_urządzenia')
+      div(id='grid_liczba_punktów')
+        article(id='liczba_punktów')
+      #grid_tabela_podsumowanie
+        table#tabela_podsumowanie
+          thead(id='tabela_podsumowanie_nagłówek')
+            tr(id='tabela_podsumowanie_nagłówek_wiersz')
+              th(class='tabela_podsumowanie_nagłówek_kolumna1')
+                | Nu
+                wbr
+                | mer za
+                wbr
+                | da
+                wbr
+                | nia
+              th(class='tabela_podsumowanie_nagłówek_kolumna2')
+                | Two
+                wbr
+                | ja od
+                wbr
+                | po
+                wbr
+                | wiedź
+              th(class='tabela_podsumowanie_nagłówek_kolumna3')
+                | Po
+                wbr
+                | praw
+                wbr
+                | na od
+                wbr
+                | po
+                wbr
+                | wiedź
+              th(class='tabela_podsumowanie_nagłówek_kolumna4')
+                | Czas spę
+                wbr
+                | dzo
+                wbr
+                | ny na za
+                wbr
+                | da
+                wbr
+                | niu
+              th(class='tabela_podsumowanie_nagłówek_kolumna5')
+                | Ka
+                wbr
+                | ra cza
+                wbr
+                | so
+                wbr
+                | wa
+              th(class='tabela_podsumowanie_nagłówek_kolumna6')
+                | Wy
+                wbr
+                | nik za
+                wbr
+                | da
+                wbr
+                | nia
+          tbody(id='tabela_podsumowanie_zawartość')
+            tr#tabela_podsumowanie_wiersz1
+              td.tabela_podsumowanie_kolumna1 a
+              td.tabela_podsumowanie_kolumna2 s
+              td.tabela_podsumowanie_kolumna3 d
+              td.tabela_podsumowanie_kolumna4 f
+              td.tabela_podsumowanie_kolumna5 g
+              td.tabela_podsumowanie_kolumna6 h
+            tr#tabela_podsumowanie_wiersz2
+              td.tabela_podsumowanie_kolumna1 a
+              td.tabela_podsumowanie_kolumna2 s
+              td.tabela_podsumowanie_kolumna3 d
+              td.tabela_podsumowanie_kolumna4 f
+              td.tabela_podsumowanie_kolumna5 g
+              td.tabela_podsumowanie_kolumna6 h
+            tr#tabela_podsumowanie_wiersz3
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+            tr#tabela_podsumowanie_wiersz4
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+            tr#tabela_podsumowanie_wiersz5
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+            tr#tabela_podsumowanie_wiersz6
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+        #grid_przyciski_zapis
+          button#zapis_wyniku.przycisk_zapisu(type='button')
+            | Zapisz tylko wynik
+          button#zapis_wyniku_i_statystyk.przycisk_zapisu(type='button')
+            | Zapisz wynik i statystyki
+    input(id = 'quiz_json' type = "hidden" value = _quiz)
+    form(action = "/" method = "POST" id = 'send_form')
+      input(id = 'quiz_result' name = 'quiz_result' type = 'hidden')
+      input(type = "hidden" name = "_csrf" value = _req.csrfToken())
+    script#quiz_script(src = "quiz.js")
+        

@@ -1,0 +1,19 @@
+html(lang='pl-PL')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title Quiz menu
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', type='text/css', media='screen', href='./quiz.css')
+  body
+    h1(id='tytuł_strony')= _message
+    form(action = "/" method = "POST")
+      .grid_przyciski_startowe
+        input(type = 'submit' name = 'begin_quiz' value = 'Zacznij nowy quiz' class = 'wybierz_quiz' class = 'wybierz_quiz_pierwszy')
+      .grid_przyciski_startowe
+        input(type = 'submit' name = 'my_score' value = 'Pokaż mój wynik' class = 'wybierz_quiz')
+      .grid_przyciski_startowe
+        input(type = 'submit' name = 'stats' value = 'Obejrzyj statystyki' class = 'wybierz_quiz')
+      .grid_przyciski_startowe
+        input(type = 'submit' name = 'comeback_quiz_menu' value = 'Wróć' class = 'wybierz_quiz')
+        input(type = "hidden" name = "_csrf" value = _req.csrfToken())

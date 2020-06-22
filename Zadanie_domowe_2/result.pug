@@ -1,0 +1,116 @@
+html(lang='pl-PL')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title= title
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', type='text/css', media='screen', href='./quiz.css')
+  body
+    h1(id='tytuł_strony')= message
+    div(id='grid_liczba_punktów')
+        article(id='liczba_punktów')
+    #grid_tabela_podsumowanie
+        table#tabela_podsumowanie
+          thead(id='tabela_podsumowanie_nagłówek')
+            tr(id='tabela_podsumowanie_nagłówek_wiersz')
+              th(class='tabela_podsumowanie_nagłówek_kolumna1')
+                | Nu
+                wbr
+                | mer za
+                wbr
+                | da
+                wbr
+                | nia
+              th(class='tabela_podsumowanie_nagłówek_kolumna2')
+                | Two
+                wbr
+                | ja od
+                wbr
+                | po
+                wbr
+                | wiedź
+              th(class='tabela_podsumowanie_nagłówek_kolumna3')
+                | Po
+                wbr
+                | praw
+                wbr
+                | na od
+                wbr
+                | po
+                wbr
+                | wiedź
+              th(class='tabela_podsumowanie_nagłówek_kolumna4')
+                | Czas spę
+                wbr
+                | dzo
+                wbr
+                | ny na za
+                wbr
+                | da
+                wbr
+                | niu
+              th(class='tabela_podsumowanie_nagłówek_kolumna5')
+                | Ka
+                wbr
+                | ra cza
+                wbr
+                | so
+                wbr
+                | wa
+              th(class='tabela_podsumowanie_nagłówek_kolumna6')
+                | Wy
+                wbr
+                | nik za
+                wbr
+                | da
+                wbr
+                | nia
+          tbody(id='tabela_podsumowanie_zawartość')
+            tr#tabela_podsumowanie_wiersz1
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+            tr#tabela_podsumowanie_wiersz2
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+            tr#tabela_podsumowanie_wiersz3
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+            tr#tabela_podsumowanie_wiersz4
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+            tr#tabela_podsumowanie_wiersz5
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+            tr#tabela_podsumowanie_wiersz6
+              td.tabela_podsumowanie_kolumna1
+              td.tabela_podsumowanie_kolumna2
+              td.tabela_podsumowanie_kolumna3
+              td.tabela_podsumowanie_kolumna4
+              td.tabela_podsumowanie_kolumna5
+              td.tabela_podsumowanie_kolumna6
+    input(id = 'quiz_result_json' type = "hidden" value = _quiz_result)
+    form(action = "/" method = "POST")
+      .grid_przyciski_startowe
+        input(type = 'submit' name = 'comeback_quiz' value = 'Wróć' class = 'wybierz_quiz')
+        input(type = "hidden" name = "_csrf" value = _req.csrfToken())
+    script#summarize_script(src = "summarize.js")
