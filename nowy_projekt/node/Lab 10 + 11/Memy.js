@@ -39,16 +39,22 @@ exports.__esModule = true;
 var Application_klasa_1 = require("./Application_klasa");
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var app;
+        var app, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    _a.trys.push([0, 2, , 3]);
                     app = new Application_klasa_1.Application();
                     return [4 /*yield*/, app.init(8080, './')];
                 case 1:
                     _a.sent();
                     app.run();
-                    return [2 /*return*/];
+                    return [3 /*break*/, 3];
+                case 2:
+                    err_1 = _a.sent();
+                    console.log(err_1);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
             }
         });
     });

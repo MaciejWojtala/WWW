@@ -9,8 +9,15 @@ export class Meme {
     private history : [number, string][];
     private database : Database;
 
-    constructor() {}
-    async init(id : number, name : string, price : number, url : string,
+    constructor() {
+        this.id = -1;
+        this.name = '';
+        this.price = -1;
+        this.url = '';
+        this.history = [];
+    }
+
+    init(id : number, name : string, price : number, url : string,
                 history : [number, string][], database : Database) {
         this.id = id;
         this.name = name;
@@ -54,55 +61,59 @@ export class Meme {
     }
 
     async getHistory() : Promise<[number, string][]> {
-        let actualState : Meme;
-        try {
-            actualState = await this.database.getMeme(this.id);
-        }
-        catch (error) {
-            console.log("getHistory error");
-            console.log(error);
-        }
-        this.copy(actualState);
-        return this.history;
+        return new Promise<[number, string][]>(async (resolve, reject) => {
+            let actualState : Meme;
+            try {
+                actualState = await this.database.getMeme(this.id);
+                this.copy(actualState);
+                resolve(this.history);
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
     }
 
     async getPrice() : Promise<number> {
-        let actualState : Meme;
-        try {
-            actualState = await this.database.getMeme(this.id);
-        }
-        catch (error) {
-            console.log("getPrice error");
-            console.log(error);
-        }
-        this.copy(actualState);
-        return this.price;
+        return new Promise<number>(async (resolve, reject) => {
+            let actualState : Meme;
+            try {
+                actualState = await this.database.getMeme(this.id);
+                this.copy(actualState);
+                resolve(this.price);
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
     }
 
     async getName() : Promise<string> {
-        let actualState : Meme;
-        try {
-            actualState = await this.database.getMeme(this.id);
-        }
-        catch (error) {
-            console.log("getName error");
-            console.log(error);
-        }
-        this.copy(actualState);
-        return this.name;
+        return new Promise<string>(async (resolve, reject) => {
+            let actualState : Meme;
+            try {
+                actualState = await this.database.getMeme(this.id);
+                this.copy(actualState);
+                resolve(this.name);
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
     }
 
     async getUrl() : Promise<string> {
-        let actualState : Meme;
-        try {
-            actualState = await this.database.getMeme(this.id);
-        }
-        catch (error) {
-            console.log("get url error");
-            console.log(error);
-        }
-        this.copy(actualState);
-        return this.url;
+        return new Promise<string>(async (resolve, reject) => {
+            let actualState : Meme;
+            try {
+                actualState = await this.database.getMeme(this.id);
+                this.copy(actualState);
+                resolve(this.url);
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
     }
 
     getAnonymousMeme() : {id: number; name: string; price: number; url: string; history: [number, string][]} {
@@ -111,16 +122,25 @@ export class Meme {
     }
 
     async setPrice(anyNewPrice : any, committer : string) : Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            const newPrice = anyToNumber(anyNewPrice);
-            if (newPrice[1] === false)
-                resolve(false);
-            this.price = newPrice[0];
-            this.history.push([this.price, committer]);
-            this.database.insertMeme(this)
-            .then(() => {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                const newPrice = anyToNumber(anyNewPrice);
+                if (newPrice[1] === false)
+                    resolve(false);
+                this.price = newPrice[0];
+                this.history.push([this.price, committer]);
+                await this.database.insertMeme(this);
                 resolve(true);
-            });
+            }
+            catch (err) {
+                try {
+                    this.database.close();
+                    reject(err);
+                }
+                catch (err) {
+                    reject(err);
+                }
+            }
         });
     }
 

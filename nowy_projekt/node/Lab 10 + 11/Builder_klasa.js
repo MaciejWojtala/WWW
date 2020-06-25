@@ -38,7 +38,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.Builder = void 0;
 var Meme_klasa_1 = require("./Meme_klasa");
-var Memes_klasa_1 = require("./Memes_klasa");
 var Database_klasa_1 = require("./Database_klasa");
 var Builder = /** @class */ (function () {
     function Builder() {
@@ -50,38 +49,58 @@ var Builder = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        var prices = [1150, 1100, 1200, 1300];
-                        _this.database.init()
-                            .then(function () {
-                            _this.memeTable[0] = new Meme_klasa_1.Meme();
-                            _this.memeTable[0].init(0, 'Gold', prices[0], 'https://i.redd.it/h7rplf9jt8y21.png', [[prices[0], "init"]], _this.database);
-                            _this.memeTable[1] = new Meme_klasa_1.Meme();
-                            _this.memeTable[1].init(1, 'Platinum', prices[1], 'http://www.quickmeme.com/img/90/90d3d6f6d527a64001b79f4e13bc61912842d4a5876d17c1f011ee519d69b469.jpg', [[prices[1], "init"]], _this.database);
-                            _this.memeTable[2] = new Meme_klasa_1.Meme();
-                            _this.memeTable[2].init(2, 'Elite', prices[2], 'https://i.imgflip.com/30zz5g.jpg', [[prices[2], "init"]], _this.database);
-                            _this.memeTable[3] = new Meme_klasa_1.Meme();
-                            _this.memeTable[3].init(3, 'Meme meme', prices[3], 'https://i.imgflip.com/41wdb2.jpg', [[prices[3], "init"]], _this.database);
-                        })
-                            .then(function () {
-                            _this.database.insertMeme(_this.memeTable[0]);
-                        })
-                            .then(function () {
-                            _this.database.insertMeme(_this.memeTable[1]);
-                        })
-                            .then(function () {
-                            _this.database.insertMeme(_this.memeTable[2]);
-                        })
-                            .then(function () {
-                            _this.database.insertMeme(_this.memeTable[3]);
-                        })
-                            .then(function () {
-                            resolve([new Memes_klasa_1.Memes(_this.memeTable), _this.database]);
-                        })["catch"](function (err) {
-                            console.log("builder error");
-                            reject(err);
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var prices, err_1, err_2;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 6, , 11]);
+                                    prices = [1150, 1100, 1200, 1300];
+                                    return [4 /*yield*/, this.database.init()];
+                                case 1:
+                                    _a.sent();
+                                    this.memeTable[0] = new Meme_klasa_1.Meme();
+                                    this.memeTable[0].init(0, 'Gold', prices[0], 'https://i.redd.it/h7rplf9jt8y21.png', [[prices[0], "init"]], this.database);
+                                    this.memeTable[1] = new Meme_klasa_1.Meme();
+                                    this.memeTable[1].init(1, 'Platinum', prices[1], 'http://www.quickmeme.com/img/90/90d3d6f6d527a64001b79f4e13bc61912842d4a5876d17c1f011ee519d69b469.jpg', [[prices[1], "init"]], this.database);
+                                    this.memeTable[2] = new Meme_klasa_1.Meme();
+                                    this.memeTable[2].init(2, 'Elite', prices[2], 'https://i.imgflip.com/30zz5g.jpg', [[prices[2], "init"]], this.database);
+                                    this.memeTable[3] = new Meme_klasa_1.Meme();
+                                    this.memeTable[3].init(3, 'Meme meme', prices[3], 'https://i.imgflip.com/41wdb2.jpg', [[prices[3], "init"]], this.database);
+                                    return [4 /*yield*/, this.database.insertMeme(this.memeTable[0])];
+                                case 2:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.database.insertMeme(this.memeTable[1])];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.database.insertMeme(this.memeTable[2])];
+                                case 4:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.database.insertMeme(this.memeTable[3])];
+                                case 5:
+                                    _a.sent();
+                                    //resolve([new Memes(this.memeTable), this.database]);
+                                    resolve(this.database);
+                                    return [3 /*break*/, 11];
+                                case 6:
+                                    err_1 = _a.sent();
+                                    _a.label = 7;
+                                case 7:
+                                    _a.trys.push([7, 9, , 10]);
+                                    return [4 /*yield*/, this.database.close()];
+                                case 8:
+                                    _a.sent();
+                                    reject(err_1);
+                                    return [3 /*break*/, 10];
+                                case 9:
+                                    err_2 = _a.sent();
+                                    reject(err_2);
+                                    return [3 /*break*/, 10];
+                                case 10: return [3 /*break*/, 11];
+                                case 11: return [2 /*return*/];
+                            }
                         });
-                    })];
+                    }); })];
             });
         });
     };

@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,50 +54,177 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 exports.Database = void 0;
-var sqlite3 = require("sqlite3");
+var sqlite3 = __importStar(require("sqlite3"));
 var Meme_klasa_1 = require("./Meme_klasa");
+var password_hash_1 = __importDefault(require("password-hash"));
 var Database = /** @class */ (function () {
     function Database() {
+        this.bestMemes = [
+            { 'id': -1,
+                'name': '',
+                'price': -1,
+                'url': '' },
+            { 'id': -1,
+                'name': '',
+                'price': -1,
+                'url': '' },
+            { 'id': -1,
+                'name': '',
+                'price': -1,
+                'url': '' }
+        ];
     }
-    Database.prototype.init = function () {
+    Database.prototype.open = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var err_1;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    this.db = new sqlite3.Database("database.db");
+                                    _a.label = 1;
+                                case 1:
+                                    _a.trys.push([1, 3, , 4]);
+                                    return [4 /*yield*/, this.run('BEGIN TRANSACTION;', [])];
+                                case 2:
+                                    _a.sent();
+                                    resolve();
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    err_1 = _a.sent();
+                                    console.log("Begin transaction error");
+                                    reject(err_1);
+                                    return [3 /*break*/, 4];
+                                case 4: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Database.prototype.run = function (sql, params) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) {
-                        _this.db = new sqlite3.Database("database.db", function (err) {
-                            sqlite3.verbose();
-                            _this.db.serialize(function () {
-                                _this.db.run('DROP TABLE IF EXISTS memes')
-                                    .run('DROP TABLE IF EXISTS histories')
-                                    .run('DROP TABLE IF EXISTS users')
-                                    .run('CREATE TABLE IF NOT EXISTS memes (id INT PRIMARY KEY, name VARCHAR(255), price INT, url VARCHAR(255));', function (err) {
-                                    if (err) {
-                                        console.log("error");
-                                        reject(err);
-                                    }
-                                }).run('CREATE TABLE IF NOT EXISTS histories (meme_id INT, commiter varchar(255), generation INT, price INT, PRIMARY KEY(meme_id, generation));', function (err) {
-                                    if (err) {
-                                        console.log("error");
-                                        reject(err);
-                                    }
-                                    resolve();
-                                }).run('CREATE TABLE IF NOT EXISTS users (user VARCHAR(255) PRIMARY KEY, password VARCHAR(255));', function (err) {
-                                    if (err) {
-                                        console.log("error");
-                                        reject(err);
-                                    }
-                                })
-                                    .run('INSERT OR REPLACE INTO users (user, password) VALUES ("user", "user"), ("admin", "admin");', function (err) {
-                                    if (err) {
-                                        console.log("error");
-                                        reject(err);
-                                    }
-                                });
-                            });
+                        _this.db.run(sql, params, function (err) {
+                            if (err) {
+                                console.log("Database run error");
+                                reject(err);
+                            }
+                            else {
+                                resolve();
+                            }
                         });
                     })];
+            });
+        });
+    };
+    Database.prototype.all = function (sql, params) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) {
+                        _this.db.all(sql, params, function (err, rows) {
+                            if (err) {
+                                console.log("Database all error");
+                                reject(err);
+                            }
+                            else {
+                                resolve(rows);
+                            }
+                        });
+                    })];
+            });
+        });
+    };
+    Database.prototype.close = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var err_2;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 2, , 3]);
+                                    return [4 /*yield*/, this.run('COMMIT;', [])];
+                                case 1:
+                                    _a.sent();
+                                    this.db.close();
+                                    resolve();
+                                    return [3 /*break*/, 3];
+                                case 2:
+                                    err_2 = _a.sent();
+                                    console.log("Commit error");
+                                    this.db.close();
+                                    reject(err_2);
+                                    return [3 /*break*/, 3];
+                                case 3: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Database.prototype.connection_close = function () {
+        this.db.close();
+    };
+    Database.prototype.init = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var err_3;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 10, , 11]);
+                                    return [4 /*yield*/, this.open()];
+                                case 1:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('DROP TABLE IF EXISTS memes', [])];
+                                case 2:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('DROP TABLE IF EXISTS histories', [])];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('DROP TABLE IF EXISTS users', [])];
+                                case 4:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('CREATE TABLE IF NOT EXISTS memes (id INT PRIMARY KEY, name VARCHAR(255), price INT, url VARCHAR(255));', [])];
+                                case 5:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('CREATE TABLE IF NOT EXISTS histories (meme_id INT, commiter varchar(255), generation INT, price INT, PRIMARY KEY(meme_id, generation));', [])];
+                                case 6:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('CREATE TABLE IF NOT EXISTS users (user VARCHAR(255) PRIMARY KEY, password VARCHAR(255));', [])];
+                                case 7:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('INSERT OR REPLACE INTO users (user, password) VALUES (?, ?), (?, ?);', ["user", password_hash_1["default"].generate('user'), "admin", password_hash_1["default"].generate('admin')])];
+                                case 8:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.close()];
+                                case 9:
+                                    _a.sent();
+                                    resolve();
+                                    return [3 /*break*/, 11];
+                                case 10:
+                                    err_3 = _a.sent();
+                                    console.log("init error");
+                                    reject(err_3);
+                                    return [3 /*break*/, 11];
+                                case 11: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
             });
         });
     };
@@ -90,39 +236,67 @@ var Database = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        if (id < length - 1) {
-                            _this.insertToHistory(id + 1, length, arg)
-                                .then(function () {
-                                _this.db.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
-                                    arg.getIdLocal(),
-                                    arg.getHistoryLocal()[id][1],
-                                    id,
-                                    arg.getHistoryLocal()[id][0]
-                                ], function (err) {
-                                    if (err) {
-                                        console.log("error insert history");
-                                        reject(err);
-                                    }
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var err_4, err_5;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!(id < length - 1)) return [3 /*break*/, 8];
+                                    _a.label = 1;
+                                case 1:
+                                    _a.trys.push([1, 6, , 7]);
+                                    return [4 /*yield*/, this.insertToHistory(id + 1, length, arg)];
+                                case 2:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.open()];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
+                                            arg.getIdLocal(),
+                                            arg.getHistoryLocal()[id][1],
+                                            id,
+                                            arg.getHistoryLocal()[id][0]
+                                        ])];
+                                case 4:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.close()];
+                                case 5:
+                                    _a.sent();
                                     resolve();
-                                });
-                            });
-                        }
-                        else {
-                            _this.db.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
-                                arg.getIdLocal(),
-                                arg.getHistoryLocal()[id][1],
-                                id,
-                                arg.getHistoryLocal()[id][0]
-                            ], function (err) {
-                                if (err) {
-                                    console.log("error insert history");
-                                    reject(err);
-                                }
-                                resolve();
-                            });
-                        }
-                    })];
+                                    return [3 /*break*/, 7];
+                                case 6:
+                                    err_4 = _a.sent();
+                                    console.log("insert history error");
+                                    reject(err_4);
+                                    return [3 /*break*/, 7];
+                                case 7: return [3 /*break*/, 13];
+                                case 8:
+                                    _a.trys.push([8, 12, , 13]);
+                                    return [4 /*yield*/, this.open()];
+                                case 9:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
+                                            arg.getIdLocal(),
+                                            arg.getHistoryLocal()[id][1],
+                                            id,
+                                            arg.getHistoryLocal()[id][0]
+                                        ])];
+                                case 10:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.close()];
+                                case 11:
+                                    _a.sent();
+                                    resolve();
+                                    return [3 /*break*/, 13];
+                                case 12:
+                                    err_5 = _a.sent();
+                                    console.log("insert history error");
+                                    reject(err_5);
+                                    return [3 /*break*/, 13];
+                                case 13: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
             });
         });
     };
@@ -130,29 +304,40 @@ var Database = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        sqlite3.verbose();
-                        try {
-                            _this.db.run('INSERT OR REPLACE INTO memes (id, name, price, url) VALUES (?, ?, ?, ?);', [
-                                arg.getIdLocal(),
-                                arg.getNameLocal(),
-                                arg.getPriceLocal(),
-                                arg.getUrlLocal()
-                            ], function (err) {
-                                if (err) {
-                                    console.log("error insert price");
-                                    reject(err);
-                                }
-                                _this.insertToHistory(0, arg.getHistoryLocal().length, arg).then(function () {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var err_6;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 5, , 6]);
+                                    return [4 /*yield*/, this.open()];
+                                case 1:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.run('INSERT OR REPLACE INTO memes (id, name, price, url) VALUES (?, ?, ?, ?);', [
+                                            arg.getIdLocal(),
+                                            arg.getNameLocal(),
+                                            arg.getPriceLocal(),
+                                            arg.getUrlLocal()
+                                        ])];
+                                case 2:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.close()];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, this.insertToHistory(0, arg.getHistoryLocal().length, arg)];
+                                case 4:
+                                    _a.sent();
                                     resolve();
-                                });
-                            });
-                        }
-                        catch (error) {
-                            console.log("insert error");
-                            reject(error);
-                        }
-                    })];
+                                    return [3 /*break*/, 6];
+                                case 5:
+                                    err_6 = _a.sent();
+                                    console.log("insert meme error");
+                                    reject(err_6);
+                                    return [3 /*break*/, 6];
+                                case 6: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
             });
         });
     };
@@ -160,55 +345,138 @@ var Database = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        var name;
-                        var price;
-                        var url;
-                        var history;
-                        sqlite3.verbose();
-                        try {
-                            var sql = "SELECT *\n                    FROM memes\n                    WHERE id = ?";
-                            var promise = _this.db.all(sql, [id], function (err, rows) {
-                                if (err) {
-                                    console.log("error select");
-                                    reject(err);
-                                }
-                                rows.forEach(function (row) {
-                                    name = row.name;
-                                    price = row.price;
-                                    url = row.url;
-                                });
-                                var sql2 = "SELECT *\n                        FROM histories\n                        WHERE meme_id = ?";
-                                var historyLength = 0;
-                                _this.db.all(sql2, [id], function (err, rows) {
-                                    if (err) {
-                                        console.log("error select");
-                                        reject(err);
-                                    }
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var name, price, url, history, sql, rows, sql2, historyLength_1, resMeme, err_7;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 6, , 7]);
+                                    return [4 /*yield*/, this.open()];
+                                case 1:
+                                    _a.sent();
+                                    sql = "SELECT *\n                    FROM memes\n                    WHERE id = ?";
+                                    return [4 /*yield*/, this.all(sql, [id])];
+                                case 2:
+                                    rows = _a.sent();
                                     rows.forEach(function (row) {
-                                        historyLength++;
+                                        name = row.name;
+                                        price = row.price;
+                                        url = row.url;
                                     });
-                                    history = new Array(historyLength);
-                                    _this.db.all(sql2, [id], function (err, rows) {
-                                        if (err) {
-                                            console.log("error select");
-                                            reject(err);
-                                        }
-                                        rows.forEach(function (row) {
-                                            history[row.generation] = [row.price, row.commiter];
-                                        });
-                                        var resMeme = new Meme_klasa_1.Meme();
-                                        resMeme.init(id, name, price, url, history, _this);
-                                        resolve(resMeme);
+                                    sql2 = "SELECT *\n                    FROM histories\n                    WHERE meme_id = ?";
+                                    historyLength_1 = 0;
+                                    return [4 /*yield*/, this.all(sql2, [id])];
+                                case 3:
+                                    rows = _a.sent();
+                                    rows.forEach(function (row) {
+                                        historyLength_1++;
                                     });
-                                });
-                            });
-                        }
-                        catch (error) {
-                            console.log("get error");
-                            reject(error);
-                        }
-                    })];
+                                    history = new Array(historyLength_1);
+                                    return [4 /*yield*/, this.all(sql2, [id])];
+                                case 4:
+                                    rows = _a.sent();
+                                    rows.forEach(function (row) {
+                                        history[row.generation] = [row.price, row.commiter];
+                                    });
+                                    return [4 /*yield*/, this.close()];
+                                case 5:
+                                    _a.sent();
+                                    resMeme = new Meme_klasa_1.Meme();
+                                    resMeme.init(id, name, price, url, history, this);
+                                    resolve(resMeme);
+                                    return [3 /*break*/, 7];
+                                case 6:
+                                    err_7 = _a.sent();
+                                    console.log("get meme error");
+                                    reject(err_7);
+                                    return [3 /*break*/, 7];
+                                case 7: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Database.prototype._getBestMemes = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var sql, rows, size, result, i, _a, _b, err_8;
+                        return __generator(this, function (_c) {
+                            switch (_c.label) {
+                                case 0:
+                                    _c.trys.push([0, 8, , 9]);
+                                    return [4 /*yield*/, this.open()];
+                                case 1:
+                                    _c.sent();
+                                    sql = 'SELECT id FROM memes ORDER BY price DESC';
+                                    return [4 /*yield*/, this.all(sql, [])];
+                                case 2:
+                                    rows = _c.sent();
+                                    return [4 /*yield*/, this.close()];
+                                case 3:
+                                    _c.sent();
+                                    size = rows.length;
+                                    if (size > 3)
+                                        size = 3;
+                                    result = new Array(size);
+                                    i = 0;
+                                    _c.label = 4;
+                                case 4:
+                                    if (!(i < size)) return [3 /*break*/, 7];
+                                    _a = result;
+                                    _b = i;
+                                    return [4 /*yield*/, this.getMeme(rows[i].id)];
+                                case 5:
+                                    _a[_b] = _c.sent();
+                                    _c.label = 6;
+                                case 6:
+                                    i++;
+                                    return [3 /*break*/, 4];
+                                case 7:
+                                    resolve(result);
+                                    return [3 /*break*/, 9];
+                                case 8:
+                                    err_8 = _c.sent();
+                                    console.log("get best memes error");
+                                    reject(err_8);
+                                    return [3 /*break*/, 9];
+                                case 9: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Database.prototype.getBestMemes = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var bestMemes, result, i, err_9;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 2, , 3]);
+                                    return [4 /*yield*/, this._getBestMemes()];
+                                case 1:
+                                    bestMemes = _a.sent();
+                                    result = new Array(bestMemes.length);
+                                    for (i = 0; i < result.length; i++) {
+                                        result[i] = bestMemes[i].getAnonymousMeme();
+                                    }
+                                    resolve(result);
+                                    return [3 /*break*/, 3];
+                                case 2:
+                                    err_9 = _a.sent();
+                                    console.log("get best memes error");
+                                    reject(err_9);
+                                    return [3 /*break*/, 3];
+                                case 3: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
             });
         });
     };

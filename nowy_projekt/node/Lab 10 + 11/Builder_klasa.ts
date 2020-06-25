@@ -13,11 +13,11 @@ export class Builder {
         this.database = new Database();
     }
 
-    async init() : Promise<[Memes, Database]> {
-        return new Promise<[Memes, Database]>((resolve, reject) => {
-        const prices = [1150, 1100, 1200, 1300];
-            this.database.init()
-            .then(() => {
+    async init() : Promise<Database> {
+        return new Promise<Database>(async (resolve, reject) => {
+            try {
+                const prices = [1150, 1100, 1200, 1300];
+                await this.database.init();
                 this.memeTable[0] = new Meme();
                 this.memeTable[0].init(0, 'Gold', prices[0],
                         'https://i.redd.it/h7rplf9jt8y21.png', [[prices[0], "init"]], this.database);
@@ -31,26 +31,22 @@ export class Builder {
                 this.memeTable[3] = new Meme();
                 this.memeTable[3].init(3, 'Meme meme', prices[3],
                         'https://i.imgflip.com/41wdb2.jpg', [[prices[3], "init"]], this.database);
-            })
-            .then(() => {
-                this.database.insertMeme(this.memeTable[0]);
-            })
-            .then(() => {
-                this.database.insertMeme(this.memeTable[1]);
-            })
-            .then(() => {
-                this.database.insertMeme(this.memeTable[2]);
-            })
-            .then(() => {
-                this.database.insertMeme(this.memeTable[3]);
-            })
-            .then(() => {
-                    resolve([new Memes(this.memeTable), this.database]);
-            })
-            .catch((err) => {
-                console.log("builder error");
-                reject(err);
-            })
+                await this.database.insertMeme(this.memeTable[0]);
+                await this.database.insertMeme(this.memeTable[1]);
+                await this.database.insertMeme(this.memeTable[2]);
+                await this.database.insertMeme(this.memeTable[3]);
+                //resolve([new Memes(this.memeTable), this.database]);
+                resolve(this.database);
+            }
+            catch(err) {
+                try {
+                    await this.database.close();
+                    reject(err);
+                }
+                catch (err) {
+                    reject(err);
+                }
+            }
         });
     }
 }
