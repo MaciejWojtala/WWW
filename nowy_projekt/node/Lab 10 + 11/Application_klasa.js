@@ -41,12 +41,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.Application = void 0;
 var Builder_klasa_1 = require("./Builder_klasa");
+var Database_klasa_1 = require("./Database_klasa");
 var express_1 = __importDefault(require("express"));
 var express_session_1 = __importDefault(require("express-session"));
 var csurf_1 = __importDefault(require("csurf"));
 var cookie_parser_1 = __importDefault(require("cookie-parser"));
 var body_parser_1 = __importDefault(require("body-parser"));
 var password_hash_1 = __importDefault(require("password-hash"));
+var Lokalne_1 = require("./Lokalne");
+var async_mutex_1 = require("async-mutex");
 var Application = /** @class */ (function () {
     function Application() {
     }
@@ -56,11 +59,13 @@ var Application = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var builder, _a, err_1;
-                        return __generator(this, function (_b) {
-                            switch (_b.label) {
+                        var builder, err_1;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
                                 case 0:
+                                    this.mutex = new async_mutex_1.Mutex();
                                     this.app = express_1["default"]();
+                                    this.app.use(cookie_parser_1["default"]('secret'));
                                     this.app.use(express_session_1["default"]({
                                         secret: 'secret',
                                         resave: true,
@@ -69,25 +74,23 @@ var Application = /** @class */ (function () {
                                     this.app.use(body_parser_1["default"].urlencoded({
                                         extended: true
                                     }));
-                                    this.app.use(cookie_parser_1["default"]('secret'));
                                     this.app.set('views', "./");
                                     this.app.set('view engine', 'pug');
                                     this.port = port;
                                     this.source = source;
                                     this.app.set('views', this.source);
                                     this.app.set('view engine', 'pug');
-                                    builder = new Builder_klasa_1.Builder();
-                                    _b.label = 1;
+                                    builder = new Builder_klasa_1.Builder(this.mutex);
+                                    _a.label = 1;
                                 case 1:
-                                    _b.trys.push([1, 3, , 4]);
-                                    _a = this;
-                                    return [4 /*yield*/, builder.init()];
+                                    _a.trys.push([1, 3, , 4]);
+                                    return [4 /*yield*/, builder.init(this.mutex)];
                                 case 2:
-                                    _a.database = _b.sent();
+                                    _a.sent();
                                     resolve();
                                     return [3 /*break*/, 4];
                                 case 3:
-                                    err_1 = _b.sent();
+                                    err_1 = _a.sent();
                                     console.log("init error");
                                     reject(err_1);
                                     return [3 /*break*/, 4];
@@ -108,7 +111,7 @@ var Application = /** @class */ (function () {
                         _a.trys.push([0, 2, , 3]);
                         if (req.session.isLogged === undefined)
                             req.session.isLogged = false;
-                        return [4 /*yield*/, this.database.getBestMemes()];
+                        return [4 /*yield*/, this.getBestMemes()];
                     case 1:
                         bestMemes = _a.sent();
                         if (!req.session.isLogged)
@@ -133,7 +136,7 @@ var Application = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.database.getMeme(req.params.memeId)];
+                        return [4 /*yield*/, this.getMeme(req.params.memeId)];
                     case 1:
                         _meme = _a.sent();
                         if (_meme === null) {
@@ -160,21 +163,21 @@ var Application = /** @class */ (function () {
     Application.prototype.postPriceChange = function () {
         var _this = this;
         this.app.post('/meme/:memeId/submit-form', function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-            var _meme, price, user, _a, err_4;
+            var _meme, priceCheck, user, _a, err_4;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         _b.trys.push([0, 4, , 5]);
-                        return [4 /*yield*/, this.database.getMeme(req.params.memeId)];
+                        return [4 /*yield*/, this.getMeme(req.params.memeId)];
                     case 1:
                         _meme = _b.sent();
                         if (_meme === null)
                             next('null error');
-                        price = req.body.price;
+                        priceCheck = Lokalne_1.anyToNumber(req.body.price);
                         user = req.session.username;
-                        _a = req.session.isLogged;
+                        _a = priceCheck[1] && req.session.isLogged;
                         if (!_a) return [3 /*break*/, 3];
-                        return [4 /*yield*/, _meme.setPrice(price, user)];
+                        return [4 /*yield*/, _meme.setPrice(priceCheck[0], user)];
                     case 2:
                         _a = (_b.sent()) === true;
                         _b.label = 3;
@@ -197,65 +200,228 @@ var Application = /** @class */ (function () {
             });
         }); });
     };
+    Application.prototype.getBestMemes = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var endFlag, database, bestMemes, err_5, flag, err_6;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    endFlag = false;
+                                    _a.label = 1;
+                                case 1:
+                                    if (!!endFlag) return [3 /*break*/, 14];
+                                    database = new Database_klasa_1.Database(this.mutex);
+                                    _a.label = 2;
+                                case 2:
+                                    _a.trys.push([2, 6, , 13]);
+                                    return [4 /*yield*/, database.open_with_transaction()];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, database.getBestMemes()];
+                                case 4:
+                                    bestMemes = _a.sent();
+                                    return [4 /*yield*/, database.commit_close()];
+                                case 5:
+                                    _a.sent();
+                                    endFlag = true;
+                                    resolve(bestMemes);
+                                    return [3 /*break*/, 13];
+                                case 6:
+                                    err_5 = _a.sent();
+                                    console.log(err_5);
+                                    flag = false;
+                                    _a.label = 7;
+                                case 7:
+                                    if (!!flag) return [3 /*break*/, 12];
+                                    _a.label = 8;
+                                case 8:
+                                    _a.trys.push([8, 10, , 11]);
+                                    return [4 /*yield*/, database.rollback_close()];
+                                case 9:
+                                    _a.sent();
+                                    flag = true;
+                                    return [3 /*break*/, 11];
+                                case 10:
+                                    err_6 = _a.sent();
+                                    database.closeDatabase();
+                                    console.log(err_6);
+                                    return [3 /*break*/, 11];
+                                case 11: return [3 /*break*/, 7];
+                                case 12: return [3 /*break*/, 13];
+                                case 13: return [3 /*break*/, 1];
+                                case 14: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Application.prototype.getMeme = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var endFlag, database, meme, err_7, flag, err_8;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    endFlag = false;
+                                    _a.label = 1;
+                                case 1:
+                                    if (!!endFlag) return [3 /*break*/, 14];
+                                    database = new Database_klasa_1.Database(this.mutex);
+                                    _a.label = 2;
+                                case 2:
+                                    _a.trys.push([2, 6, , 13]);
+                                    return [4 /*yield*/, database.open_with_transaction()];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, database.getMeme(id)];
+                                case 4:
+                                    meme = _a.sent();
+                                    return [4 /*yield*/, database.commit_close()];
+                                case 5:
+                                    _a.sent();
+                                    endFlag = true;
+                                    resolve(meme);
+                                    return [3 /*break*/, 13];
+                                case 6:
+                                    err_7 = _a.sent();
+                                    console.log(err_7);
+                                    flag = false;
+                                    _a.label = 7;
+                                case 7:
+                                    if (!!flag) return [3 /*break*/, 12];
+                                    _a.label = 8;
+                                case 8:
+                                    _a.trys.push([8, 10, , 11]);
+                                    return [4 /*yield*/, database.rollback_close()];
+                                case 9:
+                                    _a.sent();
+                                    flag = true;
+                                    return [3 /*break*/, 11];
+                                case 10:
+                                    err_8 = _a.sent();
+                                    database.closeDatabase();
+                                    console.log(err_8);
+                                    return [3 /*break*/, 11];
+                                case 11: return [3 /*break*/, 7];
+                                case 12: return [3 /*break*/, 13];
+                                case 13: return [3 /*break*/, 1];
+                                case 14: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Application.prototype.all = function (sql, params) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var endFlag, database, rows, err_9, flag, err_10;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    endFlag = false;
+                                    _a.label = 1;
+                                case 1:
+                                    if (!!endFlag) return [3 /*break*/, 14];
+                                    database = new Database_klasa_1.Database(this.mutex);
+                                    _a.label = 2;
+                                case 2:
+                                    _a.trys.push([2, 6, , 13]);
+                                    return [4 /*yield*/, database.open_with_transaction()];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, database.all(sql, params)];
+                                case 4:
+                                    rows = _a.sent();
+                                    return [4 /*yield*/, database.commit_close()];
+                                case 5:
+                                    _a.sent();
+                                    endFlag = true;
+                                    resolve(rows);
+                                    return [3 /*break*/, 13];
+                                case 6:
+                                    err_9 = _a.sent();
+                                    console.log(err_9);
+                                    flag = false;
+                                    _a.label = 7;
+                                case 7:
+                                    if (!!flag) return [3 /*break*/, 12];
+                                    _a.label = 8;
+                                case 8:
+                                    _a.trys.push([8, 10, , 11]);
+                                    return [4 /*yield*/, database.rollback_close()];
+                                case 9:
+                                    _a.sent();
+                                    flag = true;
+                                    return [3 /*break*/, 11];
+                                case 10:
+                                    err_10 = _a.sent();
+                                    database.closeDatabase();
+                                    console.log(err_10);
+                                    return [3 /*break*/, 11];
+                                case 11: return [3 /*break*/, 7];
+                                case 12: return [3 /*break*/, 13];
+                                case 13: return [3 /*break*/, 1];
+                                case 14: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
     Application.prototype.postLogin = function () {
         var _this = this;
         this.app.post('/', function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-            var username_1, password_1, logout, bestMemes, sql, rows, bestMemes, err_5;
-            var _this = this;
+            var username, password, logout, bestMemes, sql, rows, bestMemes, bestMemes, err_11;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 8, , 9]);
                         if (req.session.isLogged === undefined)
                             req.session.isLogged = false;
-                        username_1 = req.body.login;
-                        password_1 = req.body.password;
+                        username = req.body.login;
+                        password = req.body.password;
                         logout = req.body.Logout;
                         if (!logout) return [3 /*break*/, 2];
                         req.session.isLogged = false;
-                        return [4 /*yield*/, this.database.getBestMemes()];
+                        return [4 /*yield*/, this.getBestMemes()];
                     case 1:
                         bestMemes = _a.sent();
                         res.render('Memy', { title: 'Meme market', req: req, message: 'Hello there!', memes: bestMemes });
                         return [2 /*return*/];
                     case 2:
                         sql = "SELECT *\n                        FROM users\n                        WHERE user = ?";
-                        return [4 /*yield*/, this.database.open()];
+                        return [4 /*yield*/, this.all(sql, [username])];
                     case 3:
-                        _a.sent();
-                        return [4 /*yield*/, this.database.all(sql, [username_1])];
-                    case 4:
                         rows = _a.sent();
-                        return [4 /*yield*/, this.database.close()];
+                        if (!(rows.length === 1)) return [3 /*break*/, 5];
+                        if (!password_hash_1["default"].verify(password, rows[0].password)) return [3 /*break*/, 5];
+                        req.session.isLogged = true;
+                        req.session.username = username;
+                        return [4 /*yield*/, this.getBestMemes()];
+                    case 4:
+                        bestMemes = _a.sent();
+                        res.render('Memy_zalogowany', { title: 'Meme market', req: req, message: 'Hello there!', memes: bestMemes });
+                        _a.label = 5;
                     case 5:
-                        _a.sent();
-                        rows.forEach(function (row) { return __awaiter(_this, void 0, void 0, function () {
-                            var bestMemes;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        if (!password_hash_1["default"].verify(password_1, row.password)) return [3 /*break*/, 2];
-                                        req.session.isLogged = true;
-                                        req.session.username = username_1;
-                                        return [4 /*yield*/, this.database.getBestMemes()];
-                                    case 1:
-                                        bestMemes = _a.sent();
-                                        res.render('Memy_zalogowany', { title: 'Meme market', req: req, message: 'Hello there!', memes: bestMemes });
-                                        _a.label = 2;
-                                    case 2: return [2 /*return*/];
-                                }
-                            });
-                        }); });
                         if (!!req.session.isLogged) return [3 /*break*/, 7];
-                        return [4 /*yield*/, this.database.getBestMemes()];
+                        return [4 /*yield*/, this.getBestMemes()];
                     case 6:
                         bestMemes = _a.sent();
                         res.render('Memy', { title: 'Meme market', req: req, message: 'Hello there!', memes: bestMemes });
                         _a.label = 7;
                     case 7: return [3 /*break*/, 9];
                     case 8:
-                        err_5 = _a.sent();
-                        next(err_5);
+                        err_11 = _a.sent();
+                        next(err_11);
                         return [3 /*break*/, 9];
                     case 9: return [2 /*return*/];
                 }

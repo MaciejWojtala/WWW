@@ -1,25 +1,13 @@
 import * as sqlite3 from 'sqlite3';
 import { Meme } from "./Meme_klasa";
 import passwordHash from "password-hash";
+import { Mutex } from 'async-mutex';
 
 export class Database {
     private db : sqlite3.Database;
-    private bestMemes  = [
-        {'id': -1,
-        'name': '',
-        'price': -1,
-        'url': ''},
-        {'id': -1,
-        'name': '',
-        'price': -1,
-        'url': ''},
-        {'id': -1,
-        'name': '',
-        'price': -1,
-        'url': ''}
-    ];
+    private mutex : Mutex;
 
-    async open() : Promise<void> {
+    async open_with_transaction() : Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             this.db = new sqlite3.Database("database.db");
             try {
@@ -27,7 +15,7 @@ export class Database {
                 resolve();
             }
             catch(err) {
-                console.log("Begin transaction error");
+                console.log("begin transaction error");
                 reject(err);
             }
         });
@@ -61,10 +49,24 @@ export class Database {
         });
     }
 
-    async close() : Promise<void> {
+    async commit_close() : Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 await this.run('COMMIT;', []);
+                this.db.close();
+                resolve();
+            }
+            catch (err) {
+                console.log("Commit error");
+                reject(err);
+            }
+        });
+    }
+
+    async rollback_close() : Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                await this.run('ROLLBACK;', []);
                 this.db.close();
                 resolve();
             }
@@ -83,7 +85,7 @@ export class Database {
     async init() : Promise<void> {
         return new Promise<void>(async (resolve, reject) =>  {
             try {
-                await this.open();
+                await this.open_with_transaction();
                 await this.run('DROP TABLE IF EXISTS memes', []);
                 await this.run('DROP TABLE IF EXISTS histories', []);
                 await this.run('DROP TABLE IF EXISTS users', []);
@@ -92,7 +94,7 @@ export class Database {
                 await this.run('CREATE TABLE IF NOT EXISTS users (user VARCHAR(255) PRIMARY KEY, password VARCHAR(255));', []);
                 await this.run('INSERT OR REPLACE INTO users (user, password) VALUES (?, ?), (?, ?);',
                         ["user", passwordHash.generate('user'), "admin", passwordHash.generate('admin')]);
-                await this.close();
+                await this.commit_close();
                 resolve();
             }
             catch (err) {
@@ -102,7 +104,9 @@ export class Database {
         });
     }
 
-    constructor() {};
+    constructor(mutex : Mutex) {
+        this.mutex = mutex;
+    };
 
     getDatabase() : sqlite3.Database {
         return this.db;
@@ -113,14 +117,12 @@ export class Database {
             if (id < length - 1) {
                 try {
                     await this.insertToHistory(id + 1, length, arg);
-                    await this.open();
                     await this.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
                         arg.getIdLocal(),
                         arg.getHistoryLocal()[id][1],
                         id,
                         arg.getHistoryLocal()[id][0]
                     ]);
-                    await this.close();
                     resolve();
                 }
                 catch (err) {
@@ -130,14 +132,12 @@ export class Database {
             }
             else {
                 try {
-                    await this.open();
                     await this.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
                         arg.getIdLocal(),
                         arg.getHistoryLocal()[id][1],
                         id,
                         arg.getHistoryLocal()[id][0]
                     ]);
-                    await this.close();
                     resolve();
                 }
                 catch (err) {
@@ -149,16 +149,14 @@ export class Database {
     }
 
     async insertMeme(arg: Meme) : Promise<void> {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             try {
-                await this.open();
                 await this.run('INSERT OR REPLACE INTO memes (id, name, price, url) VALUES (?, ?, ?, ?);', [
                     arg.getIdLocal(),
                     arg.getNameLocal(),
                     arg.getPriceLocal(),
                     arg.getUrlLocal()
                 ]);
-                await this.close();
                 await this.insertToHistory(0, arg.getHistoryLocal().length, arg);
                 resolve();
             }
@@ -176,7 +174,6 @@ export class Database {
             let url : string;
             let history : [number, string][];
             try{
-                await this.open();
                 const sql = `SELECT *
                     FROM memes
                     WHERE id = ?`;
@@ -200,9 +197,8 @@ export class Database {
                 rows.forEach((row) => {
                     history[row.generation] = [row.price, row.commiter];
                 });
-                await this.close();
                 const resMeme = new Meme();
-                resMeme.init(id, name, price, url, history, this);
+                resMeme.init(id, name, price, url, history, this.mutex);
                 resolve(resMeme);
             }
             catch (err) {
@@ -215,16 +211,24 @@ export class Database {
     async _getBestMemes() : Promise<Meme[]> {
         return new Promise<Meme[]>(async (resolve, reject) => {
             try {
-                await this.open();
-                const sql = 'SELECT id FROM memes ORDER BY price DESC';
+                let sql = 'SELECT id, name, price, url FROM memes ORDER BY price DESC';
                 const rows = await this.all(sql, []);
-                await this.close();
                 let size = rows.length;
                 if (size > 3)
                     size = 3;
                 const result = new Array<Meme>(size);
                 for (let i = 0; i < size; i++) {
-                    result[i] = await this.getMeme(rows[i].id as number);
+                    sql = `SELECT *
+                        FROM histories
+                        WHERE meme_id = ?`;
+                    const historyRows = await this.all(sql, [rows[i].id as number]);
+                    const history = new Array<[number, string]>(historyRows.length);
+                    historyRows.forEach((row) => {
+                        history[row.generation as number] = [row.price as number, row.commiter as string];
+                    });
+                    result[i] = new Meme();
+                    result[i].init(rows[i].id as number, rows[i].name as string,
+                            rows[i].price as number, rows[i].url as string, history, this.mutex);
                 }
                 resolve(result);
             }

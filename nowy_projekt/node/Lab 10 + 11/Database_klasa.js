@@ -63,23 +63,10 @@ var sqlite3 = __importStar(require("sqlite3"));
 var Meme_klasa_1 = require("./Meme_klasa");
 var password_hash_1 = __importDefault(require("password-hash"));
 var Database = /** @class */ (function () {
-    function Database() {
-        this.bestMemes = [
-            { 'id': -1,
-                'name': '',
-                'price': -1,
-                'url': '' },
-            { 'id': -1,
-                'name': '',
-                'price': -1,
-                'url': '' },
-            { 'id': -1,
-                'name': '',
-                'price': -1,
-                'url': '' }
-        ];
+    function Database(mutex) {
+        this.mutex = mutex;
     }
-    Database.prototype.open = function () {
+    Database.prototype.open_with_transaction = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -99,7 +86,7 @@ var Database = /** @class */ (function () {
                                     return [3 /*break*/, 4];
                                 case 3:
                                     err_1 = _a.sent();
-                                    console.log("Begin transaction error");
+                                    console.log("begin transaction error");
                                     reject(err_1);
                                     return [3 /*break*/, 4];
                                 case 4: return [2 /*return*/];
@@ -145,7 +132,7 @@ var Database = /** @class */ (function () {
             });
         });
     };
-    Database.prototype.close = function () {
+    Database.prototype.commit_close = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -164,8 +151,36 @@ var Database = /** @class */ (function () {
                                 case 2:
                                     err_2 = _a.sent();
                                     console.log("Commit error");
-                                    this.db.close();
                                     reject(err_2);
+                                    return [3 /*break*/, 3];
+                                case 3: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Database.prototype.rollback_close = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var err_3;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 2, , 3]);
+                                    return [4 /*yield*/, this.run('ROLLBACK;', [])];
+                                case 1:
+                                    _a.sent();
+                                    this.db.close();
+                                    resolve();
+                                    return [3 /*break*/, 3];
+                                case 2:
+                                    err_3 = _a.sent();
+                                    console.log("Commit error");
+                                    this.db.close();
+                                    reject(err_3);
                                     return [3 /*break*/, 3];
                                 case 3: return [2 /*return*/];
                             }
@@ -182,12 +197,12 @@ var Database = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var err_3;
+                        var err_4;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
                                     _a.trys.push([0, 10, , 11]);
-                                    return [4 /*yield*/, this.open()];
+                                    return [4 /*yield*/, this.open_with_transaction()];
                                 case 1:
                                     _a.sent();
                                     return [4 /*yield*/, this.run('DROP TABLE IF EXISTS memes', [])];
@@ -211,15 +226,15 @@ var Database = /** @class */ (function () {
                                     return [4 /*yield*/, this.run('INSERT OR REPLACE INTO users (user, password) VALUES (?, ?), (?, ?);', ["user", password_hash_1["default"].generate('user'), "admin", password_hash_1["default"].generate('admin')])];
                                 case 8:
                                     _a.sent();
-                                    return [4 /*yield*/, this.close()];
+                                    return [4 /*yield*/, this.commit_close()];
                                 case 9:
                                     _a.sent();
                                     resolve();
                                     return [3 /*break*/, 11];
                                 case 10:
-                                    err_3 = _a.sent();
+                                    err_4 = _a.sent();
                                     console.log("init error");
-                                    reject(err_3);
+                                    reject(err_4);
                                     return [3 /*break*/, 11];
                                 case 11: return [2 /*return*/];
                             }
@@ -237,63 +252,51 @@ var Database = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var err_4, err_5;
+                        var err_5, err_6;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    if (!(id < length - 1)) return [3 /*break*/, 8];
+                                    if (!(id < length - 1)) return [3 /*break*/, 6];
                                     _a.label = 1;
                                 case 1:
-                                    _a.trys.push([1, 6, , 7]);
+                                    _a.trys.push([1, 4, , 5]);
                                     return [4 /*yield*/, this.insertToHistory(id + 1, length, arg)];
                                 case 2:
                                     _a.sent();
-                                    return [4 /*yield*/, this.open()];
+                                    return [4 /*yield*/, this.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
+                                            arg.getIdLocal(),
+                                            arg.getHistoryLocal()[id][1],
+                                            id,
+                                            arg.getHistoryLocal()[id][0]
+                                        ])];
                                 case 3:
                                     _a.sent();
-                                    return [4 /*yield*/, this.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
-                                            arg.getIdLocal(),
-                                            arg.getHistoryLocal()[id][1],
-                                            id,
-                                            arg.getHistoryLocal()[id][0]
-                                        ])];
+                                    resolve();
+                                    return [3 /*break*/, 5];
                                 case 4:
-                                    _a.sent();
-                                    return [4 /*yield*/, this.close()];
-                                case 5:
-                                    _a.sent();
-                                    resolve();
-                                    return [3 /*break*/, 7];
-                                case 6:
-                                    err_4 = _a.sent();
-                                    console.log("insert history error");
-                                    reject(err_4);
-                                    return [3 /*break*/, 7];
-                                case 7: return [3 /*break*/, 13];
-                                case 8:
-                                    _a.trys.push([8, 12, , 13]);
-                                    return [4 /*yield*/, this.open()];
-                                case 9:
-                                    _a.sent();
-                                    return [4 /*yield*/, this.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
-                                            arg.getIdLocal(),
-                                            arg.getHistoryLocal()[id][1],
-                                            id,
-                                            arg.getHistoryLocal()[id][0]
-                                        ])];
-                                case 10:
-                                    _a.sent();
-                                    return [4 /*yield*/, this.close()];
-                                case 11:
-                                    _a.sent();
-                                    resolve();
-                                    return [3 /*break*/, 13];
-                                case 12:
                                     err_5 = _a.sent();
                                     console.log("insert history error");
                                     reject(err_5);
-                                    return [3 /*break*/, 13];
-                                case 13: return [2 /*return*/];
+                                    return [3 /*break*/, 5];
+                                case 5: return [3 /*break*/, 9];
+                                case 6:
+                                    _a.trys.push([6, 8, , 9]);
+                                    return [4 /*yield*/, this.run('INSERT OR REPLACE INTO histories (meme_id, commiter, generation, price) VALUES (?, ?, ?, ?);', [
+                                            arg.getIdLocal(),
+                                            arg.getHistoryLocal()[id][1],
+                                            id,
+                                            arg.getHistoryLocal()[id][0]
+                                        ])];
+                                case 7:
+                                    _a.sent();
+                                    resolve();
+                                    return [3 /*break*/, 9];
+                                case 8:
+                                    err_6 = _a.sent();
+                                    console.log("insert history error");
+                                    reject(err_6);
+                                    return [3 /*break*/, 9];
+                                case 9: return [2 /*return*/];
                             }
                         });
                     }); })];
@@ -305,36 +308,30 @@ var Database = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var err_6;
+                        var err_7;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 5, , 6]);
-                                    return [4 /*yield*/, this.open()];
-                                case 1:
-                                    _a.sent();
+                                    _a.trys.push([0, 3, , 4]);
                                     return [4 /*yield*/, this.run('INSERT OR REPLACE INTO memes (id, name, price, url) VALUES (?, ?, ?, ?);', [
                                             arg.getIdLocal(),
                                             arg.getNameLocal(),
                                             arg.getPriceLocal(),
                                             arg.getUrlLocal()
                                         ])];
-                                case 2:
-                                    _a.sent();
-                                    return [4 /*yield*/, this.close()];
-                                case 3:
+                                case 1:
                                     _a.sent();
                                     return [4 /*yield*/, this.insertToHistory(0, arg.getHistoryLocal().length, arg)];
-                                case 4:
+                                case 2:
                                     _a.sent();
                                     resolve();
-                                    return [3 /*break*/, 6];
-                                case 5:
-                                    err_6 = _a.sent();
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    err_7 = _a.sent();
                                     console.log("insert meme error");
-                                    reject(err_6);
-                                    return [3 /*break*/, 6];
-                                case 6: return [2 /*return*/];
+                                    reject(err_7);
+                                    return [3 /*break*/, 4];
+                                case 4: return [2 /*return*/];
                             }
                         });
                     }); })];
@@ -346,17 +343,14 @@ var Database = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var name, price, url, history, sql, rows, sql2, historyLength_1, resMeme, err_7;
+                        var name, price, url, history, sql, rows, sql2, historyLength_1, resMeme, err_8;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 6, , 7]);
-                                    return [4 /*yield*/, this.open()];
-                                case 1:
-                                    _a.sent();
+                                    _a.trys.push([0, 4, , 5]);
                                     sql = "SELECT *\n                    FROM memes\n                    WHERE id = ?";
                                     return [4 /*yield*/, this.all(sql, [id])];
-                                case 2:
+                                case 1:
                                     rows = _a.sent();
                                     rows.forEach(function (row) {
                                         name = row.name;
@@ -366,31 +360,28 @@ var Database = /** @class */ (function () {
                                     sql2 = "SELECT *\n                    FROM histories\n                    WHERE meme_id = ?";
                                     historyLength_1 = 0;
                                     return [4 /*yield*/, this.all(sql2, [id])];
-                                case 3:
+                                case 2:
                                     rows = _a.sent();
                                     rows.forEach(function (row) {
                                         historyLength_1++;
                                     });
                                     history = new Array(historyLength_1);
                                     return [4 /*yield*/, this.all(sql2, [id])];
-                                case 4:
+                                case 3:
                                     rows = _a.sent();
                                     rows.forEach(function (row) {
                                         history[row.generation] = [row.price, row.commiter];
                                     });
-                                    return [4 /*yield*/, this.close()];
-                                case 5:
-                                    _a.sent();
                                     resMeme = new Meme_klasa_1.Meme();
-                                    resMeme.init(id, name, price, url, history, this);
+                                    resMeme.init(id, name, price, url, history, this.mutex);
                                     resolve(resMeme);
-                                    return [3 /*break*/, 7];
-                                case 6:
-                                    err_7 = _a.sent();
+                                    return [3 /*break*/, 5];
+                                case 4:
+                                    err_8 = _a.sent();
                                     console.log("get meme error");
-                                    reject(err_7);
-                                    return [3 /*break*/, 7];
-                                case 7: return [2 /*return*/];
+                                    reject(err_8);
+                                    return [3 /*break*/, 5];
+                                case 5: return [2 /*return*/];
                             }
                         });
                     }); })];
@@ -402,47 +393,59 @@ var Database = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var sql, rows, size, result, i, _a, _b, err_8;
-                        return __generator(this, function (_c) {
-                            switch (_c.label) {
+                        var sql, rows, size, result, _loop_1, this_1, i, err_9;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
                                 case 0:
-                                    _c.trys.push([0, 8, , 9]);
-                                    return [4 /*yield*/, this.open()];
-                                case 1:
-                                    _c.sent();
-                                    sql = 'SELECT id FROM memes ORDER BY price DESC';
+                                    _a.trys.push([0, 6, , 7]);
+                                    sql = 'SELECT id, name, price, url FROM memes ORDER BY price DESC';
                                     return [4 /*yield*/, this.all(sql, [])];
-                                case 2:
-                                    rows = _c.sent();
-                                    return [4 /*yield*/, this.close()];
-                                case 3:
-                                    _c.sent();
+                                case 1:
+                                    rows = _a.sent();
                                     size = rows.length;
                                     if (size > 3)
                                         size = 3;
                                     result = new Array(size);
+                                    _loop_1 = function (i) {
+                                        var historyRows, history_1;
+                                        return __generator(this, function (_a) {
+                                            switch (_a.label) {
+                                                case 0:
+                                                    sql = "SELECT *\n                        FROM histories\n                        WHERE meme_id = ?";
+                                                    return [4 /*yield*/, this_1.all(sql, [rows[i].id])];
+                                                case 1:
+                                                    historyRows = _a.sent();
+                                                    history_1 = new Array(historyRows.length);
+                                                    historyRows.forEach(function (row) {
+                                                        history_1[row.generation] = [row.price, row.commiter];
+                                                    });
+                                                    result[i] = new Meme_klasa_1.Meme();
+                                                    result[i].init(rows[i].id, rows[i].name, rows[i].price, rows[i].url, history_1, this_1.mutex);
+                                                    return [2 /*return*/];
+                                            }
+                                        });
+                                    };
+                                    this_1 = this;
                                     i = 0;
-                                    _c.label = 4;
+                                    _a.label = 2;
+                                case 2:
+                                    if (!(i < size)) return [3 /*break*/, 5];
+                                    return [5 /*yield**/, _loop_1(i)];
+                                case 3:
+                                    _a.sent();
+                                    _a.label = 4;
                                 case 4:
-                                    if (!(i < size)) return [3 /*break*/, 7];
-                                    _a = result;
-                                    _b = i;
-                                    return [4 /*yield*/, this.getMeme(rows[i].id)];
-                                case 5:
-                                    _a[_b] = _c.sent();
-                                    _c.label = 6;
-                                case 6:
                                     i++;
-                                    return [3 /*break*/, 4];
-                                case 7:
+                                    return [3 /*break*/, 2];
+                                case 5:
                                     resolve(result);
-                                    return [3 /*break*/, 9];
-                                case 8:
-                                    err_8 = _c.sent();
+                                    return [3 /*break*/, 7];
+                                case 6:
+                                    err_9 = _a.sent();
                                     console.log("get best memes error");
-                                    reject(err_8);
-                                    return [3 /*break*/, 9];
-                                case 9: return [2 /*return*/];
+                                    reject(err_9);
+                                    return [3 /*break*/, 7];
+                                case 7: return [2 /*return*/];
                             }
                         });
                     }); })];
@@ -454,7 +457,7 @@ var Database = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var bestMemes, result, i, err_9;
+                        var bestMemes, result, i, err_10;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
@@ -469,9 +472,9 @@ var Database = /** @class */ (function () {
                                     resolve(result);
                                     return [3 /*break*/, 3];
                                 case 2:
-                                    err_9 = _a.sent();
+                                    err_10 = _a.sent();
                                     console.log("get best memes error");
-                                    reject(err_9);
+                                    reject(err_10);
                                     return [3 /*break*/, 3];
                                 case 3: return [2 /*return*/];
                             }

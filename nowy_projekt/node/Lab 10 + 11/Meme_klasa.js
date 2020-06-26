@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.Meme = void 0;
 var Lokalne_1 = require("./Lokalne");
+var Database_klasa_1 = require("./Database_klasa");
 var Meme = /** @class */ (function () {
     function Meme() {
         this.id = -1;
@@ -46,14 +47,132 @@ var Meme = /** @class */ (function () {
         this.url = '';
         this.history = [];
     }
-    Meme.prototype.init = function (id, name, price, url, history, database) {
+    Meme.prototype.init = function (id, name, price, url, history, mutex) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.url = url;
         this.history = new Array(1);
         this.history = history;
-        this.database = database;
+        this.mutex = mutex;
+    };
+    Meme.prototype.getMeme = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var endFlag, database, meme, err_1, flag, err_2;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    endFlag = false;
+                                    _a.label = 1;
+                                case 1:
+                                    if (!!endFlag) return [3 /*break*/, 14];
+                                    database = new Database_klasa_1.Database(this.mutex);
+                                    _a.label = 2;
+                                case 2:
+                                    _a.trys.push([2, 6, , 13]);
+                                    return [4 /*yield*/, database.open_with_transaction()];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, database.getMeme(id)];
+                                case 4:
+                                    meme = _a.sent();
+                                    return [4 /*yield*/, database.commit_close()];
+                                case 5:
+                                    _a.sent();
+                                    endFlag = true;
+                                    resolve(meme);
+                                    return [3 /*break*/, 13];
+                                case 6:
+                                    err_1 = _a.sent();
+                                    console.log(err_1);
+                                    flag = false;
+                                    _a.label = 7;
+                                case 7:
+                                    if (!!flag) return [3 /*break*/, 12];
+                                    _a.label = 8;
+                                case 8:
+                                    _a.trys.push([8, 10, , 11]);
+                                    return [4 /*yield*/, database.rollback_close()];
+                                case 9:
+                                    _a.sent();
+                                    flag = true;
+                                    return [3 /*break*/, 11];
+                                case 10:
+                                    err_2 = _a.sent();
+                                    database.closeDatabase();
+                                    console.log(err_2);
+                                    return [3 /*break*/, 11];
+                                case 11: return [3 /*break*/, 7];
+                                case 12: return [3 /*break*/, 13];
+                                case 13: return [3 /*break*/, 1];
+                                case 14: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Meme.prototype.insertMeme = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var endFlag, database, err_3, flag, err_4;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    endFlag = false;
+                                    _a.label = 1;
+                                case 1:
+                                    if (!!endFlag) return [3 /*break*/, 14];
+                                    database = new Database_klasa_1.Database(this.mutex);
+                                    _a.label = 2;
+                                case 2:
+                                    _a.trys.push([2, 6, , 13]);
+                                    return [4 /*yield*/, database.open_with_transaction()];
+                                case 3:
+                                    _a.sent();
+                                    return [4 /*yield*/, database.insertMeme(this)];
+                                case 4:
+                                    _a.sent();
+                                    return [4 /*yield*/, database.commit_close()];
+                                case 5:
+                                    _a.sent();
+                                    endFlag = true;
+                                    resolve();
+                                    return [3 /*break*/, 13];
+                                case 6:
+                                    err_3 = _a.sent();
+                                    console.log(err_3);
+                                    flag = false;
+                                    _a.label = 7;
+                                case 7:
+                                    if (!!flag) return [3 /*break*/, 12];
+                                    _a.label = 8;
+                                case 8:
+                                    _a.trys.push([8, 10, , 11]);
+                                    return [4 /*yield*/, database.rollback_close()];
+                                case 9:
+                                    _a.sent();
+                                    flag = true;
+                                    return [3 /*break*/, 11];
+                                case 10:
+                                    err_4 = _a.sent();
+                                    database.closeDatabase();
+                                    console.log(err_4);
+                                    return [3 /*break*/, 11];
+                                case 11: return [3 /*break*/, 7];
+                                case 12: return [3 /*break*/, 13];
+                                case 13: return [3 /*break*/, 1];
+                                case 14: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
     };
     Meme.prototype.getHistoryLocal = function () {
         return this.history;
@@ -84,20 +203,20 @@ var Meme = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var actualState, err_1;
+                        var actualState, err_5;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
                                     _a.trys.push([0, 2, , 3]);
-                                    return [4 /*yield*/, this.database.getMeme(this.id)];
+                                    return [4 /*yield*/, this.getMeme(this.id)];
                                 case 1:
                                     actualState = _a.sent();
                                     this.copy(actualState);
                                     resolve(this.history);
                                     return [3 /*break*/, 3];
                                 case 2:
-                                    err_1 = _a.sent();
-                                    reject(err_1);
+                                    err_5 = _a.sent();
+                                    reject(err_5);
                                     return [3 /*break*/, 3];
                                 case 3: return [2 /*return*/];
                             }
@@ -111,20 +230,20 @@ var Meme = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var actualState, err_2;
+                        var actualState, err_6;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
                                     _a.trys.push([0, 2, , 3]);
-                                    return [4 /*yield*/, this.database.getMeme(this.id)];
+                                    return [4 /*yield*/, this.getMeme(this.id)];
                                 case 1:
                                     actualState = _a.sent();
                                     this.copy(actualState);
                                     resolve(this.price);
                                     return [3 /*break*/, 3];
                                 case 2:
-                                    err_2 = _a.sent();
-                                    reject(err_2);
+                                    err_6 = _a.sent();
+                                    reject(err_6);
                                     return [3 /*break*/, 3];
                                 case 3: return [2 /*return*/];
                             }
@@ -138,20 +257,20 @@ var Meme = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var actualState, err_3;
+                        var actualState, err_7;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
                                     _a.trys.push([0, 2, , 3]);
-                                    return [4 /*yield*/, this.database.getMeme(this.id)];
+                                    return [4 /*yield*/, this.getMeme(this.id)];
                                 case 1:
                                     actualState = _a.sent();
                                     this.copy(actualState);
                                     resolve(this.name);
                                     return [3 /*break*/, 3];
                                 case 2:
-                                    err_3 = _a.sent();
-                                    reject(err_3);
+                                    err_7 = _a.sent();
+                                    reject(err_7);
                                     return [3 /*break*/, 3];
                                 case 3: return [2 /*return*/];
                             }
@@ -165,20 +284,20 @@ var Meme = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var actualState, err_4;
+                        var actualState, err_8;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
                                     _a.trys.push([0, 2, , 3]);
-                                    return [4 /*yield*/, this.database.getMeme(this.id)];
+                                    return [4 /*yield*/, this.getMeme(this.id)];
                                 case 1:
                                     actualState = _a.sent();
                                     this.copy(actualState);
                                     resolve(this.url);
                                     return [3 /*break*/, 3];
                                 case 2:
-                                    err_4 = _a.sent();
-                                    reject(err_4);
+                                    err_8 = _a.sent();
+                                    reject(err_8);
                                     return [3 /*break*/, 3];
                                 case 3: return [2 /*return*/];
                             }
@@ -196,32 +315,31 @@ var Meme = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var newPrice, err_5;
+                        var newPrice, err_9;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 2, , 3]);
+                                    _a.trys.push([0, 3, , 4]);
                                     newPrice = Lokalne_1.anyToNumber(anyNewPrice);
                                     if (newPrice[1] === false)
                                         resolve(false);
                                     this.price = newPrice[0];
                                     this.history.push([this.price, committer]);
-                                    return [4 /*yield*/, this.database.insertMeme(this)];
+                                    return [4 /*yield*/, this.mutex.acquire()];
                                 case 1:
                                     _a.sent();
-                                    resolve(true);
-                                    return [3 /*break*/, 3];
+                                    return [4 /*yield*/, this.insertMeme()];
                                 case 2:
-                                    err_5 = _a.sent();
-                                    try {
-                                        this.database.close();
-                                        reject(err_5);
-                                    }
-                                    catch (err) {
-                                        reject(err);
-                                    }
-                                    return [3 /*break*/, 3];
-                                case 3: return [2 /*return*/];
+                                    _a.sent();
+                                    this.mutex.release();
+                                    resolve(true);
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    err_9 = _a.sent();
+                                    this.mutex.release();
+                                    reject(err_9);
+                                    return [3 /*break*/, 4];
+                                case 4: return [2 /*return*/];
                             }
                         });
                     }); })];

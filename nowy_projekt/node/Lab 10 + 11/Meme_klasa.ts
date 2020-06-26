@@ -1,5 +1,6 @@
 import { anyToNumber } from "./Lokalne";
 import { Database } from "./Database_klasa";
+import { Mutex } from 'async-mutex';
 
 export class Meme {
     private id : number;
@@ -7,7 +8,7 @@ export class Meme {
     private price : number;
     private url : string;
     private history : [number, string][];
-    private database : Database;
+    private mutex : Mutex;
 
     constructor() {
         this.id = -1;
@@ -18,14 +19,76 @@ export class Meme {
     }
 
     init(id : number, name : string, price : number, url : string,
-                history : [number, string][], database : Database) {
+                history : [number, string][], mutex : Mutex) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.url = url;
         this.history = new Array<[number, string]>(1);
         this.history = history;
-        this.database = database;
+        this.mutex = mutex;
+    }
+
+    private async getMeme(id : number) : Promise<Meme> {
+        return new Promise<Meme>
+                (async (resolve, reject) => {
+            let endFlag = false;
+            while (!endFlag) {
+                const database = new Database(this.mutex);
+                try {
+                    await database.open_with_transaction();
+                    const meme = await database.getMeme(id);
+                    await database.commit_close();
+                    endFlag = true;
+                    resolve(meme);
+                }
+                catch (err) {
+                    console.log(err);
+                    let flag = false;
+                    while (!flag) {
+                        try {
+                            await database.rollback_close();
+                            flag = true;
+                        }
+                        catch (err) {
+                            database.closeDatabase();
+                            console.log(err);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private async insertMeme() : Promise<void> {
+        return new Promise<void>
+                (async (resolve, reject) => {
+            let endFlag = false;
+            while (!endFlag) {
+                const database = new Database(this.mutex);
+                try {
+                    await database.open_with_transaction();
+                    await database.insertMeme(this);
+                    await database.commit_close();
+                    endFlag = true;
+                    resolve();
+                }
+                catch (err) {
+                    console.log(err);
+                    let flag = false;
+                    while (!flag) {
+                        try {
+                            await database.rollback_close();
+                            flag = true;
+                        }
+                        catch (err) {
+                            database.closeDatabase();
+                            console.log(err);
+                        }
+                    }
+                }
+            }
+        });
     }
 
 
@@ -64,7 +127,7 @@ export class Meme {
         return new Promise<[number, string][]>(async (resolve, reject) => {
             let actualState : Meme;
             try {
-                actualState = await this.database.getMeme(this.id);
+                actualState = await this.getMeme(this.id);
                 this.copy(actualState);
                 resolve(this.history);
             }
@@ -78,7 +141,7 @@ export class Meme {
         return new Promise<number>(async (resolve, reject) => {
             let actualState : Meme;
             try {
-                actualState = await this.database.getMeme(this.id);
+                actualState = await this.getMeme(this.id);
                 this.copy(actualState);
                 resolve(this.price);
             }
@@ -92,7 +155,7 @@ export class Meme {
         return new Promise<string>(async (resolve, reject) => {
             let actualState : Meme;
             try {
-                actualState = await this.database.getMeme(this.id);
+                actualState = await this.getMeme(this.id);
                 this.copy(actualState);
                 resolve(this.name);
             }
@@ -106,7 +169,7 @@ export class Meme {
         return new Promise<string>(async (resolve, reject) => {
             let actualState : Meme;
             try {
-                actualState = await this.database.getMeme(this.id);
+                actualState = await this.getMeme(this.id);
                 this.copy(actualState);
                 resolve(this.url);
             }
@@ -129,17 +192,14 @@ export class Meme {
                     resolve(false);
                 this.price = newPrice[0];
                 this.history.push([this.price, committer]);
-                await this.database.insertMeme(this);
+                await this.mutex.acquire();
+                await this.insertMeme();
+                this.mutex.release();
                 resolve(true);
             }
             catch (err) {
-                try {
-                    this.database.close();
-                    reject(err);
-                }
-                catch (err) {
-                    reject(err);
-                }
+                this.mutex.release();
+                reject(err);
             }
         });
     }
