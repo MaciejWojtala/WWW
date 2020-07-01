@@ -1,59 +1,67 @@
+import express, { Express, RequestHandler } from "express";
+import { ParamsDictionary } from "express-serve-static-core";
+import { Server } from "http";
+import session from "express-session";
+import csurf from "csurf";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
+import passwordHash from "password-hash";
 import { DbClass } from "./database";
+import { ParsedQs } from "qs";
+
 
 export class App {
     private port : number;
-    private express : any;
-    private app : any;
-    private session : any;
-    private csurf : any;
-    private cookieParser : any;
-    private csrfProtection : any;
-    private bodyParser : any;
+    private app : Express;
+    private csrfProtection : RequestHandler<ParamsDictionary, any, any, ParsedQs>;
     private store : any;
     private SQLiteStore : any;
     private source : string;
-    private db : DbClass;
+    private server : Server;
+    private exportQuizList : string;
+    private exportQuiz : string;
+    private exportQuizResult : string;
 
     constructor(port : number, source : string) {
         this.port = port;
         this.source = source;
-        this.db = new DbClass();
+        this.exportQuizList = "";
+        this.exportQuiz = "";
+        this.exportQuizResult = "";
 
-        this.express = require('express');
-        this.session = require('express-session');
-        this.bodyParser = require('body-parser');
-        this.csurf = require('csurf');
-        this.cookieParser = require('cookie-parser');
-        this.SQLiteStore = require('connect-sqlite3')(this.session);
+        this.SQLiteStore = require('connect-sqlite3')(session);
         this.store = new this.SQLiteStore({db: ':memory:', dir: './'});
 
-        this.app = this.express();
+        this.app = express();
 
-        this.csrfProtection = this.csurf({
+        this.csrfProtection = csurf({
             cookie: true
         });
 
-        this.app.use(this.session({
+        this.app.use(cookieParser('secret'));
+
+        this.app.use(session({
             store: this.store,
             secret: 'secret',
             resave: true,
             saveUninitialized: true
         }))
 
-        this.app.use(this.bodyParser.urlencoded({
+        this.app.use(bodyParser.urlencoded({
             extended: true
         }));
-        this.app.use(this.cookieParser('secret'));
+        this.app.use(bodyParser.json());
+
         this.app.use(this.csrfProtection);
 
         this.app.set('views', this.source);
         this.app.set('view engine', 'pug');
 
-        this.app.use(this.express.urlencoded({
+        this.app.use(express.urlencoded({
             extended: true
         }));
 
-        this.app.use(this.express.static(__dirname));
+        this.app.use(express.static(__dirname));
 
     }
 
@@ -72,15 +80,16 @@ export class App {
 
     private async changePassword(req : any, res : any, new_password : string) : Promise<void>{
         return new Promise<void>(async (resolve, reject) => {
+            const db = new DbClass();
             try {
-                await this.db.open();
+                await db.open_with_transaction();
                 const username = req.session.username as string;
                 let sql = 'INSERT OR REPLACE INTO USERS (user_name, user_password) VALUES (?, ?);';
-                await this.db.run(sql, [username, new_password]);
+                await db.run(sql, [username, passwordHash.generate(new_password)]);
                 sql = 'SELECT session_ID FROM sessions WHERE user_name = ?';
-                const session_rows = await this.db.all(sql, [username]);
+                const session_rows = await db.all(sql, [username]);
                 sql = 'DELETE FROM sessions WHERE user_name = ?';
-                await this.db.run(sql, [username]);
+                await db.run(sql, [username]);
                 session_rows.forEach((row) => {
                    this.store.destroy(row.session_id, (err) => {
                         if (err)
@@ -89,12 +98,12 @@ export class App {
                 });
                 req.session.destroy();
 
-                await this.db.close();
+                await db.commit_close();
                 resolve();
             }
             catch (err) {
                 try {
-                    await this.db.close();
+                    await db.rollback_close();
                     reject(err);
                 }
                 catch (err) {
@@ -104,42 +113,14 @@ export class App {
         });
     }
 
-    private async getQuizPage(req, res, quiz_name : string) : Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
-            let quiz : string;
-            try {
-                await this.db.open();
-                const sql = 'SELECT quiz_json from quizzes WHERE quiz_name = ?;';
-                const quiz_rows = await this.db.all(sql, [quiz_name]);
-                quiz_rows.forEach((row) => {
-                    quiz = row.quiz_json as string;
-                });
-                try {
-                    await this.db.close();
-                }
-                catch (err) {
-                    reject(err);
-                }
-            }
-            catch (err) {
-                try {
-                    await this.db.close();
-                }
-                catch (err) {
-                    reject(err);
-                }
-                reject(err);
-            }
-            req.session.begin_time = new Date().getTime();
-            res.render('quiz', {_quiz : quiz, _req : req });
-            resolve();
-        });
+    private getQuizPage(req, res, quiz_name : string) : void {
+        res.render('quiz', {_req : req});
     }
 
     private async setStatsTable(req : any, res : any)
     {
-        return new Promise
-        (async (resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+            const db = new DbClass();
             try {
                 const quiz_size = 7;
                 const highscore = 5;
@@ -150,23 +131,26 @@ export class App {
                 }
 
                 for(let i = 0; i < quiz_size; i++) {
-                     avg[i] = '-';
+                    avg[i] = '-';
                     for(let j = 0; j < highscore; j++)
                         bests[i][j] = '-';
                 }
 
-                await this.db.open();
+                await db.open_with_transaction();
+
+                let sql : string;
+                let highscore_rows : any[];
 
                 for (let i = 0; i < quiz_size - 1; i++) {
-                    let sql = 'SELECT result FROM question_results WHERE question_nr = ? AND quiz_name = ? ORDER BY result  ASC';
-                    let highscore_rows = await this.db.all(sql, [i + 1, req.session.quiz_name as string]);
+                    sql = 'SELECT result FROM question_results WHERE question_nr = ? AND quiz_name = ? ORDER BY result ASC';
+                    highscore_rows = await db.all(sql, [i + 1, req.session.quiz_name as string]);
                     for (let j = 0; j < highscore_rows.length; j++) {
                         if (j >= 5)
                             break;
                         bests[i][j] = highscore_rows[j].result as string;
                     }
                     sql = 'SELECT AVG(result) as avg FROM question_results WHERE question_nr = ? AND quiz_name = ? AND punishment = ?';
-                    highscore_rows = await this.db.all(sql, [i + 1, req.session.quiz_name as string, 0]);
+                    highscore_rows = await db.all(sql, [i + 1, req.session.quiz_name as string, 0]);
                     for (let j = 0; j < highscore_rows.length; j++) {
                         if (j >= 5)
                             break;
@@ -175,15 +159,15 @@ export class App {
                     }
                 }
 
-                let sql = 'SELECT result FROM results WHERE quiz_name = ? ORDER BY result  ASC';
-                let highscore_rows = await this.db.all(sql, [req.session.quiz_name as string]);
+                sql = 'SELECT result FROM results WHERE quiz_name = ? ORDER BY result  ASC';
+                highscore_rows = await db.all(sql, [req.session.quiz_name as string]);
                 for (let j = 0; j < highscore_rows.length; j++) {
                     if (j >= 5)
                         break;
                      bests[6][j] = highscore_rows[j].result as string;
                 }
                 sql = 'SELECT AVG(result) as avg FROM results WHERE quiz_name = ?';
-                highscore_rows = await this.db.all(sql, [req.session.quiz_name as string]);
+                highscore_rows = await db.all(sql, [req.session.quiz_name as string]);
                 for (let j = 0; j < highscore_rows.length; j++) {
                     if (j >= 5)
                         break;
@@ -191,12 +175,18 @@ export class App {
                         avg[6] = this.round(highscore_rows[j].avg).toString();
                 }
 
-                await this.db.close();
+                await db.commit_close();
 
                 resolve({ bests, avg });
             }
             catch (err) {
-                reject(err);
+                try {
+                    await db.rollback_close();
+                    reject(err);
+                }
+                catch (err) {
+                    reject(err);
+                }
             }
         });
     }
@@ -216,7 +206,7 @@ export class App {
 
     private getChooseQuizPage(req : any, res : any) : void {
         const quizzes_list = req.session.quizzes_list as string;
-        res.render('choose_quiz', {quizzes : JSON.parse(quizzes_list).quizzes, _req : req});
+        res.render('choose_quiz', {_req : req});
     }
 
     private getChangePasswordPage(req : any, res : any, message : string) {
@@ -236,17 +226,55 @@ export class App {
         });
     }
 
-    private async save_result(req : any, next : any, quiz_result_json : string) : Promise<void> {
+    private postQuizRequest(req : any, res : any, quiz_name : string) {
+        return new Promise<void>(async (resolve, reject) => {
+            let quiz : string;
+            const db = new DbClass();
+            try {
+                await db.open_with_transaction();
+                const sql = 'SELECT quiz_json from quizzes WHERE quiz_name = ?;';
+                const quiz_rows = await db.all(sql, [quiz_name]);
+                quiz_rows.forEach((row) => {
+                    quiz = row.quiz_json as string;
+                    this.exportQuiz = quiz as string;
+                });
+                await db.commit_close();
+            }
+            catch (err) {
+                try {
+                    await db.rollback_close();
+                    reject(err);
+                }
+                catch (err) {
+                    reject(err);
+                }
+            }
+            try {
+                req.session.begin_time = new Date().getTime();
+                res.send(JSON.parse(quiz));
+                resolve();
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    getExportQuiz() : string {
+        return this.exportQuiz;
+    }
+
+    private async save_result(req : any, res : any, next : any, quiz_result : {
+                jsonString : string,
+                answers : string[],
+                percentage : number[]
+            }) : Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             const total_time = (req.session.end_time as number - req.session.begin_time as number) / 1000;
             let result = 0;
+            const db = new DbClass();
             try {
-                await this.db.open();
-                const quiz_result = await JSON.parse(quiz_result_json) as {
-                    jsonString : string,
-                    answers : string[],
-                    percentage : number[]
-                }
+                await db.open_with_transaction();
                 const quiz = await JSON.parse(quiz_result.jsonString) as {
                     name : string,
                     questions : string[],
@@ -266,20 +294,22 @@ export class App {
                     result += question_results[i];
                 }
                 result = this.round(result);
-                await this.db.run('INSERT OR REPLACE INTO results (user_name, quiz_name, result) VALUES (?, ?, ?);',
+                await db.run('INSERT OR REPLACE INTO results (user_name, quiz_name, result) VALUES (?, ?, ?);',
                         [req.session.username as string, quiz.name, result]);
                 for (let i = 0; i < quiz.questions.length; i++)
-                    await this.db.run('INSERT OR REPLACE INTO question_results (question_nr, user_name, quiz_name, time, answer, correct_answer, punishment, result) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ;',
+                    await db.run('INSERT OR REPLACE INTO question_results (question_nr, user_name, quiz_name, time, answer, correct_answer, punishment, result) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ;',
                             [i + 1, req.session.username as string, quiz.name,
                             question_times[i], quiz_result.answers[i], quiz.correct_answers[i],
                             punishments[i], question_results[i]]);
-                await this.db.close();
+                await db.commit_close();
+                const json = {};
+                res.send(json);
                 resolve();
 
             }
             catch (err) {
                 try {
-                    await this.db.close();
+                    await db.rollback_close();
                     reject(err);
                 }
                 catch (err) {
@@ -289,9 +319,15 @@ export class App {
         });
     }
 
+    getExportQuizResult() : string {
+        return this.exportQuizResult;
+    }
+
     private async getSummarize(req : any, res : any) : Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
+            const db = new DbClass();
             try {
+                await db.open_with_transaction();
                 const username = req.session.username as string;
                 const quiz_name = req.session.quiz_name as string;
                 let result : number;
@@ -302,7 +338,7 @@ export class App {
                 const punishments = new Array<number>(quiz_length);
                 const question_results = new Array<number>(quiz_length);
                 const sql = 'SELECT * FROM results WHERE user_name = ? AND quiz_name = ?';
-                const summarize_rows = await this.db.all(sql, [username, quiz_name]);
+                const summarize_rows = await db.all(sql, [username, quiz_name]);
                 summarize_rows.forEach((row) => {
                     result = row.result;
                 });
@@ -310,7 +346,7 @@ export class App {
 
                 for (let i = 0; i < quiz_length; i++) {
                     const _sql = 'SELECT * FROM question_results WHERE question_nr = ? AND user_name = ? AND quiz_name = ?';
-                    const _summarize_rows = await this.db.all(_sql, [i + 1, username, quiz_name]);
+                    const _summarize_rows = await db.all(_sql, [i + 1, username, quiz_name]);
                     _summarize_rows.forEach((row) => {
                         question_times[i] = row.time as number;
                         answers[i] = row.answer as string;
@@ -319,6 +355,7 @@ export class App {
                         question_results[i] = row.result as number;
                     });
                 }
+                await db.commit_close();
 
                 res.render('result', {title : 'Podsumowanie', message : 'Twój wynik', _req : req, _quiz_result :
                         JSON.stringify({result, question_times, answers, correct_answers, punishments, question_results})});
@@ -326,73 +363,8 @@ export class App {
                 resolve();
             }
             catch (err) {
-                reject(err);
-            }
-        });
-
-
-    }
-
-    private async postLoginPage(req : any, res : any) : Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
-            const username = req.body.username as string;
-            const password = req.body.password as string;
-            let sql =
-                `SELECT *
-                FROM users
-                WHERE user_name = ? AND user_password = ?;`;
-            try {
-                await this.db.open();
-                const user_rows = await this.db.all(sql, [username, password]);
-                user_rows.forEach(async (row) => {
-                    req.session.isLogged = true;
-                    req.session.username = username;
-                    sql = 'INSERT OR REPLACE INTO sessions (session_id, user_name) VALUES (?, ?);';
-                    try {
-                        await this.db.run(sql, [req.sessionID, username]);
-                    }
-                    catch (err) {
-                        try {
-                            await this.db.close();
-                            reject(err);
-                        }
-                        catch (err) {
-                            reject(err);
-                        }
-                    }
-                });
-                if (!req.session.isLogged) {
-                    this.getLoginPage(req, res, "Błędne dane logowania");
-                    try {
-                        await this.db.close();
-                        resolve();
-                    }
-                    catch (err) {
-                        reject(err);
-                    }
-                }
-                else {
-                    sql =
-                    `SELECT quiz_list
-                    FROM quizzes_list;`;
-                    const quizzes_lists_array = await this.db.all(sql, []);
-                    quizzes_lists_array.forEach((row) => {
-                        req.session.quizzes_list = row.quiz_list as string;
-                    });
-
-                    this.getChooseQuizPage(req, res);
-                    try {
-                        await this.db.close();
-                        resolve();
-                    }
-                    catch (err) {
-                        reject(err);
-                    }
-                }
-            }
-            catch (err) {
                 try {
-                    await this.db.close();
+                    await db.rollback_close();
                     reject(err);
                 }
                 catch (err) {
@@ -402,13 +374,77 @@ export class App {
         });
     }
 
+    private postQuizList(req : any, res : any, next : any) {
+        try {
+            res.send(JSON.parse(req.session.quizzes_list));
+        }
+        catch (err) {
+            next(err);
+        }
+    }
+
+    private async postLoginPage(req : any, res : any) : Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            const username = req.body.username as string;
+            const password = req.body.password as string;
+            const db = new DbClass();
+            let sql =
+                `SELECT *
+                FROM users
+                WHERE user_name = ?;`;
+            try {
+                await db.open_with_transaction();
+                const user_rows = await db.all(sql, [username]);
+                if (user_rows.length === 1) {
+                    if (passwordHash.verify(password, user_rows[0].user_password as string)) {
+                        req.session.isLogged = true;
+                        req.session.username = username;
+                        sql = 'INSERT OR REPLACE INTO sessions (session_id, user_name) VALUES (?, ?);';
+                        await db.run(sql, [req.sessionID, username]);
+                    }
+                }
+                if (!req.session.isLogged) {
+                    this.getLoginPage(req, res, "Błędne dane logowania");
+                }
+                else {
+                    sql =
+                        `SELECT quiz_list
+                        FROM quizzes_list;`;
+                    const quizzes_lists_array = await db.all(sql, []);
+                    quizzes_lists_array.forEach((row) => {
+                        req.session.quizzes_list = row.quiz_list as string;
+                        this.exportQuizList = req.session.quizzes_list as string;
+                    });
+
+                    this.getChooseQuizPage(req, res);
+                }
+                await db.commit_close();
+                resolve();
+            }
+            catch (err) {
+                try {
+                    await db.rollback_close();
+                    reject(err);
+                }
+                catch (err) {
+                    reject(err);
+                }
+            }
+        });
+    }
+
+    getExportQuizList() : string {
+        return this.exportQuizList;
+    }
+
     private async wasFilled(req : any) : Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
+            const db = new DbClass();
             try {
-                await this.db.open();
-                const results_rows = await this.db.all('SELECT * FROM results WHERE user_name = ? AND quiz_name = ?;',
+                await db.open_with_transaction();
+                const results_rows = await db.all('SELECT * FROM results WHERE user_name = ? AND quiz_name = ?;',
                         [req.session.username as string, req.session.quiz_name as string]);
-                await this.db.close();
+                await db.commit_close();
                 if (results_rows.length > 0)
                     resolve(true);
                 else
@@ -416,7 +452,7 @@ export class App {
             }
             catch (err) {
                 try {
-                    await this.db.close();
+                    await db.rollback_close();
                     reject(err);
                 }
                 catch (err) {
@@ -426,62 +462,70 @@ export class App {
         });
     }
 
-    private postPage() : void {
-        this.app.post('/', async (req, res, next) => {
-            if (req.session.isLogged === undefined)
-                req.session.isLogged = false;
+    private async loging_handle(req : any, res : any) : Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
             if (req.body.login_send) {
                 try {
                     await this.postLoginPage(req, res);
+                    resolve(true);
                 }
                 catch (err) {
-                    next(err);
+                    reject(err);
                 }
             }
             else if (!req.session.isLogged) {
                 this.getLoginPage(req, res, 'Zaloguj się');
+                resolve(true);
             }
             else if (req.body.logout) {
                 try {
                     req.session.isLogged = false;
-                    await this.getLoginPage(req, res, 'Zaloguj się');
+                    this.getLoginPage(req, res, 'Zaloguj się');
+                    resolve(true);
                 }
                 catch (err) {
-                    next(err);
+                    reject(err);
                 }
             }
             else if (req.body.change_password) {
                 this.getChangePasswordPage(req, res, 'Zmień hasło');
+                resolve(true);
             }
             else if (req.body.comeback_change || req.body.comeback_quiz_menu) {
                 this.getChooseQuizPage(req, res);
+                resolve(true);
             }
-            else if (req.body.quiz) {
+            else {
+                resolve(false);
+            }
+        });
+    }
+
+    private async quiz_menu_handle(req : any, res : any, next : any) : Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            if (req.body.quiz) {
+                const db = new DbClass();
                 try {
-                    await this.db.open();
+                    await db.open_with_transaction();
                     const sql =
-                    `SELECT quiz_name, quiz_json
-                    FROM quizzes;`;
-                    const quizes_rows = await this.db.all(sql, []);
-                    try {
-                        await this.db.close();
-                    }
-                    catch (err) {
-                        next(err);
-                    }
+                        `SELECT quiz_name, quiz_json
+                        FROM quizzes;`;
+                    const quizes_rows = await db.all(sql, []);
+                    await db.commit_close();
                     quizes_rows.forEach((row) => {
                         if (req.body.quiz as string === row.quiz_name as string) {
                             this.getQuizMenuPage(req, res, row.quiz_name as string, row.quiz_name as string + ' - menu');
                         }
                     });
+                    resolve(true);
                 }
                 catch (err) {
                     try {
-                        await this.db.close();
-                        next(err);
+                        await db.rollback_close();
+                        reject(err);
                     }
                     catch (err) {
-                        next(err);
+                        reject(err);
                     }
                 }
             }
@@ -491,37 +535,96 @@ export class App {
                     if (wasSolved) {
                         this.getQuizMenuPage(req, res, req.session.quiz_name as string, 'Już wypełniono quiz');
                     }
+                    else if (req.session.begin_time &&
+                            (!req.session.end_time || req.session.begin_time > req.session.end_time)) {
+                        this.getQuizMenuPage(req, res, req.session.quiz_name as string, 'Quiz jest aktualnie wypełniany');
+                    }
                     else {
-                        await this.getQuizPage(req, res, req.session.quiz_name);
+                        this.getQuizPage(req, res, req.session.quiz_name as string);
+                    }
+                    resolve(true);
+                }
+                catch (err) {
+                    reject(err);
+                }
+            }
+            else if (req.body.my_score) {
+                try {
+                    const wasSolved = await this.wasFilled(req);
+                    if (!wasSolved) {
+                        this.getQuizMenuPage(req, res, req.session.quiz_name as string, 'Jeszcze nie wypełniono quizu');
+                    }
+                    else {
+                        await this.getSummarize(req, res);
                     }
                 }
                 catch (err) {
-                    next(err);
+                    reject(err);
+                }
+                resolve(true);
+            }
+            else if (req.body.stats) {
+                try {
+                    await this.getStats(req, res);
+                    resolve(true);
+                }
+                catch (err) {
+                    reject(err);
                 }
             }
-            else if (req.body.cancel_quiz) {
-                this.getQuizMenuPage(req, res, req.session.quiz_name as string, req.session.quiz_name as string + ' - menu');
+            else if (req.body.comeback_stats) {
+                this.getQuizMenuPage(req, res, req.session.quiz_name as string, req.session.quiz_name + ' - menu');
+                resolve(true);
             }
-            else if (req.body.commit_change) {
-                if (!req.body.new_password_1 || !req.body.new_password_2)
-                    this.getChangePasswordPage(req, res, 'Błędna zmiana hasła') 
+            else if (req.body.getQuizList) {
+                this.postQuizList(req, res, next);
+                resolve(true);
+            }
+            else {
+                resolve(false);
+            }
+        });
+    }
+
+    private async change_password_handle(req : any, res : any) : Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            if (req.body.commit_change) {
+                if (!req.body.new_password_1 || !req.body.new_password_2) {
+                    this.getChangePasswordPage(req, res, 'Błędna zmiana hasła');
+                    resolve(true);
+                }
                 else {
                     const new_password_1 = req.body.new_password_1 as string;
                     const new_password_2 = req.body.new_password_2 as string;
-                    if (new_password_1 !== new_password_2 || new_password_1 === "")
+                    if (new_password_1 !== new_password_2 || new_password_1 === "") {
                         this.getChangePasswordPage(req, res, 'Błędna zmiana hasła');
+                        resolve(true);
+                    }
                     else {
+                        const db = new DbClass();
                         try {
                             await this.changePassword(req, res, new_password_1);
-                            await this.db.open();
-                            await this.db.close();
                             this.getLoginPage(req, res, 'Zaloguj się');
+                            resolve(true);
                         }
                         catch (err) {
-                            next(err);
+                            reject(err);
                         }
                     }
                 }
+            }
+            else {
+                resolve(false);
+            }
+        });
+    }
+
+    private async quiz_handle(req : any, res : any, next : any) : Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            if (req.body.cancel_quiz) {
+                req.session.end_time = new Date().getTime();
+                this.getQuizMenuPage(req, res, req.session.quiz_name as string, req.session.quiz_name as string + ' - menu');
+                resolve(true);
             }
             else if (req.body.quiz_result) {
                 req.session.end_time = new Date().getTime();
@@ -531,46 +634,51 @@ export class App {
                         this.getQuizMenuPage(req, res, req.session.quiz_name as string, 'Już wypełniono quiz');
                     }
                     else {
-                        await this.save_result(req, next, req.body.quiz_result as string);
-                        this.getSummarize(req, res);
+                        this.exportQuizResult = JSON.stringify(req.body.quiz_result);
+                        await this.save_result(req, res, next, req.body.quiz_result);
                     }
+                    resolve(true);
                 }
                 catch (err) {
-                    next(err);
+                    reject(err);
                 }
             }
             else if (req.body.comeback_quiz) {
                 this.getQuizMenuPage(req, res, req.session.quiz_name as string, req.session.quiz_name + ' - menu');
+                resolve(true);
             }
-            else if (req.body.my_score) {
-                try {
-                    const wasSolved = await this.wasFilled(req);
-                    if (!wasSolved) {
-                        this.getQuizMenuPage(req, res, req.session.quiz_name as string, 'Jeszcze nie wypełniono quizu');
-                    }
-                    else {
-                        this.getSummarize(req, res);
-                    }
-                }
-                catch (err) {
-                    next(err);
-                }
+            else if (req.body.getQuizJSON) {
+                this.postQuizRequest(req, res, req.session.quiz_name as string);
             }
-            else if (req.body.stats) {
-                try {
-                    await this.getStats(req, res);
-                }
-                catch (err) {
-                    next(err);
-                }
-            }
-            else if (req.body.comeback_stats) {
-                this.getQuizMenuPage(req, res, req.session.quiz_name as string, req.session.quiz_name + ' - menu');
+            else {
+                resolve(false);
             }
         });
     }
 
+    private postPage() : void {
+        this.app.post('/', async (req, res, next) => {
+            if (req.session.isLogged === undefined)
+                req.session.isLogged = false;
+            let flag = false;
+            try {
+                flag = await this.loging_handle(req, res);
+                if (!flag)
+                    flag = await this.quiz_menu_handle(req, res, next);
+                if (!flag)
+                    flag = await this.change_password_handle(req, res);
+                if (!flag)
+                    flag = await this.quiz_handle(req, res, next);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+    }
 
+    close() {
+        this.server.close();
+    }
 
     private errorHandler(err, req, res, next) : void {
         console.log(err);
@@ -583,6 +691,6 @@ export class App {
 
         this.app.use(this.errorHandler);
 
-        this.app.listen(this.port, () => {});
+        this.server = this.app.listen(this.port, () => {});
     }
 }

@@ -1,11 +1,11 @@
 import * as sqlite3 from 'sqlite3';
-
+import passwordHash from "password-hash";
 
 export class DbClass {
     private db : sqlite3.Database;
 
     constructor() {}
-    async open() : Promise<void> {
+    async open_with_transaction() : Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this.db = new sqlite3.Database("database.db", async (err) => {
                 if (err) {
@@ -29,7 +29,6 @@ export class DbClass {
             this.db.run(sql, params, (err) => {
                 if (err) {
                     console.log("Database error");
-                    this.close();
                     reject(err);
                 }
                 else {
@@ -53,10 +52,24 @@ export class DbClass {
         })
     }
 
-    async close() : Promise<void> {
+    async commit_close() : Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 await this.run('COMMIT;', []);
+                this.db.close();
+                resolve();
+            }
+            catch (err) {
+                console.log("Commit error");
+                reject(err);
+            }
+        });
+    }
+
+    async rollback_close() : Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                await this.run('ROLLBACK;', []);
                 this.db.close();
                 resolve();
             }
@@ -81,7 +94,7 @@ export class DbClass {
             await this.run(sql, []);
 
             sql = 'INSERT OR REPLACE INTO users (user_name, user_password) VALUES (?, ?), (?, ?);';
-            await this.run(sql, ["user1", "user1", "user2", "user2"]);
+            await this.run(sql, ['user1', passwordHash.generate('user1'), 'user2', passwordHash.generate('user2')]);
 
             sql = 'DROP TABLE IF EXISTS sessions;';
             await this.run(sql, []);
@@ -100,7 +113,7 @@ export class DbClass {
 
             sql = 'CREATE TABLE IF NOT EXISTS question_results(question_nr INTEGER, user_name VARCHAR(255), quiz_name VARCHAR(255), time REAL, answer VARCHAR(255), correct_answer VARCHAR(255), punishment REAL, result REAL, PRIMARY KEY(question_nr, user_name, quiz_name), FOREIGN KEY(user_name) REFERENCES users(user_name));';
             await this.run(sql, []);
-            
+
             sql = 'DROP TABLE IF EXISTS quizzes;';
             await this.run(sql, []);
 
@@ -217,7 +230,7 @@ export class DbClass {
             sql = 'CREATE TABLE IF NOT EXISTS quizzes_list (quiz_list VARCHAR(255) PRIMARY KEY);',
             await this.run(sql, []);
 
-            let quiz_list_json = `{
+            const quiz_list_json = `{
                 "quizzes": [
                     "Quiz A",
                     "Quiz B",

@@ -1,6 +1,28 @@
-(function () {
-    const quiz_json_el = document.getElementById("quiz_json") as HTMLInputElement;
-    const jsonString: string = quiz_json_el.value;
+(async function () {
+    let jsonString : string;
+    const csrf_value = (document.getElementsByName('_csrf')[0] as HTMLInputElement).value;
+    const token = document.querySelector('input[name="_csrf"]').getAttribute('value');
+
+    try {
+        await fetch('/', {
+            credentials: 'same-origin',
+            method: 'POST',
+            body: JSON.stringify({
+                getQuizJSON: true,
+            }),
+            headers: {
+                'CSRF-Token': token,
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then((data) => {
+            jsonString = JSON.stringify(data);
+        })
+    }
+    catch (err) {
+        console.log(err);
+    }
 
     class IQuestions {
         length: number;
@@ -54,7 +76,7 @@
         const input_answers = document.querySelectorAll
                 ("input[type=number][class=odpowiedź]");
 
-        const answers : string[] = new Array<string>(quiz.questions.length);;
+        const answers : string[] = new Array<string>(quiz.questions.length);
         const spent_time : number[] = new Array<number>(quiz.questions.length);
         let time = -1;
         let question_number = 0;
@@ -188,10 +210,12 @@
                         count++;
                 }
 
-                if (count === answers.length)
+                if (count === answers.length) {
                     end_quiz_button.disabled = false;
-                else
+                }
+                else {
                     end_quiz_button.disabled = true;
+                }
 
             });
         }
@@ -214,6 +238,7 @@
             const introduction_content = document.getElementById("wstęp");
             const time_content = document.getElementById("czas");
 
+            clear_forms();
             for (let i = 0; i < headers3.length; i++) {
                 const header3 = headers3[i] as HTMLElement;
                 header3.textContent = "Treść zadania";
@@ -257,27 +282,51 @@
             set_text_content_to_question_number(question_number);
         });
 
-        function send_results() {
-            const form = document.getElementById('send_form') as HTMLFormElement;
-            const send_result = document.getElementById('quiz_result') as HTMLInputElement;
-            let percentage : number[];
-            let whole_time = 0;
-            spent_time.forEach((problem) => {
-                whole_time += problem;
+        async function send_results() : Promise<void> {
+            return new Promise<void>(async (resolve, reject) => {
+                let percentage : number[];
+                let whole_time = 0;
+                spent_time.forEach((problem) => {
+                    whole_time += problem;
+                });
+                percentage = new Array<number>(quiz.questions.length);
+                for (let i = 0; i < percentage.length; i++) {
+                    percentage[i] = round(spent_time[i] * 100 / whole_time);
+                }
+                const result_json = { jsonString, answers, percentage };
+                try {
+                    await fetch('/', {
+                        credentials: 'same-origin',
+                        method: 'POST',
+                        body: JSON.stringify({
+                            quiz_result: result_json,
+                        }),
+                        headers: {
+                            'CSRF-Token': token,
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        (document.getElementById('render_summarize') as HTMLInputElement).click();
+                        resolve();
+                    })
+                }
+                catch (err) {
+                    reject(err);
+                }
             });
-            percentage = new Array<number>(quiz.questions.length);
-            for (let i = 0; i < percentage.length; i++) {
-                percentage[i] = round(spent_time[i] * 100 / whole_time);
-            }
-            const result_json = { jsonString, answers, percentage };
-            send_result.value = JSON.stringify(result_json);
-            form.submit();
 
         }
 
-        end_quiz_button.addEventListener('click', event => {
+        end_quiz_button.addEventListener('click', async (event) => {
             clear_after_quiz(question_number);
-            send_results();
+            try {
+                await send_results();
+            }
+            catch (err) {
+                console.log(err);
+            }
         });
 
         setInterval(() => {

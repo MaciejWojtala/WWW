@@ -1,104 +1,60 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 (function () {
-    /*const jsonString: string = `{
-        "questions": [
-            "2 + 2 = ",
-            "3 * 6 : 9 = ",
-            "8 - 7 * 15 = ",
-            "83 * (7 * 15 - 35 * 3) = ",
-            "80 : (9 * 7 - 8 * 8) = ",
-            "64 : 2 : 4 : 8 = "
-        ],
-        "correct_answers": [
-            "4",
-            "2",
-            "-97",
-            "0",
-            "-80",
-            "1"
-        ],
-        "introduction": "Quiz algebraiczny, w każdym zadaniu należy podać jako wynik liczbę całkowitą.<br>Nie należy podawać zer wiodących, poprzedzać liczb znakiem \\"+\\" lub poprzedzać zera znakiem \\"-\\".<br>Na wynik mają wpływ: poprawność odpowiedzi i czas wypełniania quizu."
-    }`;*/
-    var quiz_json_el = document.getElementById("quiz_json");
-    var jsonString = quiz_json_el.value; //'<%= _quiz %>';// {{_quiz}};
-    //console.log(jsonString);
-    /*fetch("localhost:8080")
-    .then(response => response.json())
-    .then(data => {
-        jsonString = data as string;
-    })
-    .catch ((err) => {
-        console.log(err);
-    });*/
-    var IQuestions = /** @class */ (function () {
-        function IQuestions() {
+    return __awaiter(this, void 0, void 0, function () {
+        function check_IQuiz(data) {
+            if (!data || typeof data !== "object")
+                return false;
+            var projection = data;
+            return projection.questions !== undefined &&
+                projection.introduction !== undefined &&
+                projection.correct_answers !== undefined;
         }
-        return IQuestions;
-    }());
-    var ICorrectAnswers = /** @class */ (function () {
-        function ICorrectAnswers() {
-        }
-        return ICorrectAnswers;
-    }());
-    function check_IQuiz(data) {
-        if (!data || typeof data !== "object")
-            return false;
-        var projection = data;
-        return projection.questions !== undefined &&
-            projection.introduction !== undefined &&
-            projection.correct_answers !== undefined;
-    }
-    var quiz;
-    function check_quiz() {
-        var any_quiz = JSON.parse(jsonString);
-        if (check_IQuiz(any_quiz)) {
-            quiz = any_quiz;
-            return true;
-        }
-        else {
-            console.log("Błąd tworzenia quizu");
-            return false;
-        }
-    }
-    if (check_quiz()) {
-        //const start_button = document.getElementById
-        //      ("nowy_quiz") as HTMLInputElement;
-        //const highscore_button = document.getElementById
-        //      ("najlepsze_wyniki") as HTMLInputElement;
-        var previous_question_button_1 = document.getElementById("poprzednie_pytanie");
-        var next_question_button_1 = document.getElementById("następne_pytanie");
-        var cancel_quiz_button = document.getElementById("anuluj_quiz");
-        var end_quiz_button_1 = document.getElementById("zakończ_quiz");
-        var save_only_result_button = document.getElementById("zapis_wyniku");
-        var save_with_statistics_button = document.getElementById("zapis_wyniku_i_statystyk");
-        var comeback_button = document.getElementById("przycisk_wróć");
-        var input_answers = document.querySelectorAll("input[type=number][class=odpowiedź]");
-        var database_name_1 = "database";
-        var result_storage_name_1 = "result_storage";
-        var statistics_storage_name_1 = "statistics_storage";
-        var highscore_table_length_1 = 5;
-        var answers_1 = new Array(quiz.questions.length);
-        var statistics_1 = new Array(quiz.questions.length);
-        var spent_time_1 = new Array(quiz.questions.length);
-        var result_value_1 = -1;
-        var database_1;
-        var database_open_flag_1 = false;
-        var time_1 = -1;
-        var question_number_1 = 0;
-        var ResultObject_1 = /** @class */ (function () {
-            function ResultObject(result) {
-                this.result = result;
+        function check_quiz() {
+            var any_quiz = JSON.parse(jsonString);
+            if (check_IQuiz(any_quiz)) {
+                quiz = any_quiz;
+                return true;
             }
-            return ResultObject;
-        }());
-        var StatisticObject_1 = /** @class */ (function () {
-            function StatisticObject(statistics_table) {
-                this.statistics = new Array(statistics_table.length);
-                for (var i = 0; i < statistics_table.length; i++)
-                    this.statistics[i] = statistics_table[i];
+            else {
+                console.log("Błąd tworzenia quizu");
+                return false;
             }
-            return StatisticObject;
-        }());
-        start();
+        }
         function clear_after_quiz(local_question_number) {
             if (local_question_number < 1 ||
                 local_question_number > quiz.questions.length)
@@ -157,34 +113,8 @@
                 local_question_number > quiz.questions.length)
                 return;
             clear_after_quiz(local_question_number);
-            //show_homepage_view()
             clear_forms();
         }
-        /*function get_back_from_summary_to_homepage() : void {
-            const grid_result = document.getElementById
-                    ("grid_liczba_punktów") as HTMLElement;
-            const grid_summary = document.getElementById
-                    ("grid_tabela_podsumowanie") as HTMLElement;
-            const grid_save_buttons = document.getElementById
-                    ("grid_przyciski_zapis") as HTMLElement;
-            const header = document.getElementById
-                    ("tytuł_strony") as HTMLElement;
-
-            grid_result.style.display = "none";
-            grid_summary.style.display = "none";
-            grid_save_buttons.style.display = "none";
-
-            clear_forms();
-            //show_homepage_view();
-            //header.textContent = "Quiz";
-        }*/
-        /*function show_homepage_view() : void {
-            const header = document.getElementById("tytuł_strony") as HTMLElement;
-
-            start_button.style.display = "inline-block";
-            highscore_button.style.display = "inline-block";
-            header.textContent = "Quiz";
-        }*/
         function clear_forms() {
             var forms = document.getElementsByClassName("formularz_odpowiedzi");
             end_quiz_button_1.disabled = true;
@@ -194,131 +124,6 @@
                 var form = forms[i];
                 form.reset();
             }
-        }
-        function getCell(row, cell_class_name) {
-            var cells = row.getElementsByClassName(cell_class_name);
-            return cells[0];
-        }
-        function summarize() {
-            var result = 0;
-            for (var i = 0; i < quiz.questions.length; i++) {
-                var row = document.getElementById("tabela_podsumowanie_wiersz" +
-                    (i + 1).toString());
-                var id_prefix = "tabela_podsumowanie_kolumna";
-                var cell = getCell(row, id_prefix + "1");
-                cell.textContent = (i + 1).toString();
-                cell = getCell(row, id_prefix + "2");
-                cell.textContent = answers_1[i];
-                cell = getCell(row, id_prefix + "3");
-                cell.textContent = quiz.correct_answers[i];
-                cell = getCell(row, id_prefix + "4");
-                cell.textContent = spent_time_1[i].toString();
-                var punishment = 0;
-                if (answers_1[i] !== quiz.correct_answers[i])
-                    punishment = 10 * (i + 1);
-                cell = getCell(row, id_prefix + "5");
-                cell.textContent = punishment.toString();
-                cell = getCell(row, id_prefix + "6");
-                statistics_1[i] = spent_time_1[i] + punishment;
-                cell.textContent = statistics_1[i].toString();
-                result += statistics_1[i];
-            }
-            return result;
-        }
-        function fill_highscore_table() {
-            var id_prefix = "tabela_najlepsze_wyniki_kolumna";
-            for (var i = 0; i < highscore_table_length_1; i++) {
-                var row = document.getElementById("tabela_najlepsze_wyniki_wiersz" +
-                    (i + 1).toString());
-                var cell = getCell(row, id_prefix + "1");
-                cell.textContent = (i + 1).toString();
-                cell = getCell(row, id_prefix + "2");
-                cell.textContent = "-";
-            }
-            var transaction = database_1.transaction([result_storage_name_1], "readonly");
-            transaction.oncomplete = function (event) { };
-            transaction.onerror = function (event) {
-                console.log("Nie udało się wczytać wyników");
-            };
-            var objectStore = transaction.objectStore(result_storage_name_1);
-            var request = objectStore.getAll();
-            request.onsuccess = function (event) {
-                var projection = event.target;
-                var result = projection.result;
-                result.sort(function (a, b) { return a.result - b.result; });
-                for (var i = 0; i < highscore_table_length_1; i++) {
-                    var row = document.getElementById("tabela_najlepsze_wyniki_wiersz" +
-                        (i + 1).toString());
-                    var cell = getCell(row, id_prefix + "2");
-                    if (i < result.length)
-                        cell.textContent = result[i].result + " sekund" +
-                            get_polish_suffix(result[i].result);
-                }
-            };
-            request.onerror = function (event) {
-                console.log("Nie udało się wczytać wyników");
-            };
-        }
-        function open_database() {
-            var request = indexedDB.open(database_name_1);
-            request.onerror = function (event) {
-                console.log("Otworzenie bazy danych nie powiodło się");
-            };
-            request.onsuccess = function (event) {
-                database_1 = request.result;
-                database_open_flag_1 = true;
-            };
-            request.onupgradeneeded = function (event) {
-                var event_target_projection = event.target;
-                var local_database = event_target_projection.result;
-                local_database.createObjectStore(result_storage_name_1);
-                local_database.createObjectStore(statistics_storage_name_1);
-            };
-            request.onblocked = function (event) {
-                console.log("Baza zablokowana");
-            };
-        }
-        function getRandom() {
-            return Math.random().toString(36).substring(2, 15) +
-                Math.random().toString(36).substring(2, 15);
-        }
-        function save_data(object, storage_name) {
-            var transaction = database_1.transaction([storage_name], "readwrite");
-            transaction.oncomplete = function (event) { };
-            transaction.onerror = function (event) {
-                console.log("Błąd zapisu wyniku");
-            };
-            var objectStore = transaction.objectStore(storage_name);
-            var request;
-            try {
-                request = objectStore.add(object, getRandom());
-                request.onsuccess = function (event) { };
-                request.onerror = function (event) {
-                    console.log("Błąd zapisu wyniku");
-                };
-            }
-            catch (e) {
-                console.log("Błąd zapisu wyniku");
-            }
-        }
-        function check_database_flag() {
-            if (!database_open_flag_1) {
-                console.log("Błąd komunikacji z bazą danych");
-                return false;
-            }
-            return true;
-        }
-        function save_result() {
-            if (!check_database_flag())
-                return;
-            var object = new ResultObject_1(result_value_1);
-            save_data(object, result_storage_name_1);
-        }
-        function save_statistics() {
-            if (!check_database_flag())
-                return;
-            var object = new StatisticObject_1(statistics_1);
-            save_data(object, statistics_storage_name_1);
         }
         function get_polish_suffix(value) {
             if (value === 1)
@@ -330,30 +135,9 @@
                 return "";
             return "y";
         }
-        window.addEventListener('DOMContentLoaded', clear_forms);
-        var _loop_1 = function (i) {
-            var input_answer = input_answers[i];
-            input_answer.addEventListener('input', function (event) {
-                answers_1[i] = input_answer.value;
-                var count = 0;
-                for (var j = 0; j < answers_1.length; j++) {
-                    if (answers_1[j] !== "")
-                        count++;
-                }
-                if (count === answers_1.length)
-                    end_quiz_button_1.disabled = false;
-                else
-                    end_quiz_button_1.disabled = true;
-            });
-        };
-        for (var i = 0; i < input_answers.length; i++) {
-            _loop_1(i);
-        }
-        window.addEventListener('load', open_database);
         function round(arg) {
             return Math.round((arg + Number.EPSILON) * 100) / 100;
         }
-        //start_button.addEventListener('click', event => {
         function start() {
             var grid_introduction = document.getElementById("grid_wstęp");
             var grid_change_question = document.getElementById("grid_przyciski_zmiana_pytania");
@@ -363,6 +147,7 @@
             var grid_time = document.getElementById("grid_czas");
             var introduction_content = document.getElementById("wstęp");
             var time_content = document.getElementById("czas");
+            clear_forms();
             for (var i = 0; i < headers3.length; i++) {
                 var header3 = headers3[i];
                 header3.textContent = "Treść zadania";
@@ -373,8 +158,6 @@
             time_1 = 0;
             time_content.textContent = time_1.toString() + " sekund" +
                 get_polish_suffix(time_1);
-            //start_button.style.display = "none";
-            //highscore_button.style.display = "none";
             grid_introduction.style.display = "block";
             grid_change_question.style.display = "block";
             grid_end_quiz.style.display = "block";
@@ -383,115 +166,181 @@
             end_quiz_button_1.disabled = true;
             introduction_content.innerHTML = quiz.introduction;
             set_text_content_to_question_number(question_number_1);
-            //});
         }
-        cancel_quiz_button.addEventListener('click', function (event) {
-            get_back_from_quiz_to_homepage(question_number_1);
-            question_number_1 = 0;
-            time_1 = -1;
-        });
-        previous_question_button_1.addEventListener('click', function (event) {
-            switch_off_old_question(question_number_1);
-            question_number_1--;
-            set_text_content_to_question_number(question_number_1);
-        });
-        next_question_button_1.addEventListener('click', function (event) {
-            switch_off_old_question(question_number_1);
-            question_number_1++;
-            set_text_content_to_question_number(question_number_1);
-        });
         function send_results() {
-            var form = document.getElementById('send_form');
-            var send_result = document.getElementById('quiz_result');
-            //let a = spent_time[0]
-            var percentage;
-            var whole_time = 0;
-            spent_time_1.forEach(function (problem) {
-                whole_time += problem;
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                            var percentage, whole_time, i, result_json, err_2;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        whole_time = 0;
+                                        spent_time_1.forEach(function (problem) {
+                                            whole_time += problem;
+                                        });
+                                        percentage = new Array(quiz.questions.length);
+                                        for (i = 0; i < percentage.length; i++) {
+                                            percentage[i] = round(spent_time_1[i] * 100 / whole_time);
+                                        }
+                                        result_json = { jsonString: jsonString, answers: answers_1, percentage: percentage };
+                                        _a.label = 1;
+                                    case 1:
+                                        _a.trys.push([1, 3, , 4]);
+                                        return [4 /*yield*/, fetch('/', {
+                                                credentials: 'same-origin',
+                                                method: 'POST',
+                                                body: JSON.stringify({
+                                                    quiz_result: result_json
+                                                }),
+                                                headers: {
+                                                    'CSRF-Token': token,
+                                                    "Content-Type": "application/json"
+                                                }
+                                            })
+                                                .then(function (response) { return response.json(); })
+                                                .then(function (data) {
+                                                document.getElementById('render_summarize').click();
+                                                resolve();
+                                            })];
+                                    case 2:
+                                        _a.sent();
+                                        return [3 /*break*/, 4];
+                                    case 3:
+                                        err_2 = _a.sent();
+                                        reject(err_2);
+                                        return [3 /*break*/, 4];
+                                    case 4: return [2 /*return*/];
+                                }
+                            });
+                        }); })];
+                });
             });
-            console.log(spent_time_1);
-            console.log(percentage);
-            percentage = new Array(quiz.questions.length);
-            for (var i = 0; i < percentage.length; i++) {
-                percentage[i] = round(spent_time_1[i] * 100 / whole_time);
-            }
-            var result_json = { jsonString: jsonString, answers: answers_1, percentage: percentage };
-            send_result.value = JSON.stringify(result_json);
-            //send_result.click();
-            form.submit();
         }
-        /*highscore_button.addEventListener('click', event => {
-            if (!check_database_flag())
-                return;
-
-            const header = document.getElementById("tytuł_strony") as HTMLElement;
-            const grid_highscore_table = document.getElementById
-                    ("grid_tabela_najlepsze_wyniki") as HTMLElement;
-            const grid_comeback_button = document.getElementById
-                    ("grid_przycisk_wróć") as HTMLElement;
-
-            start_button.style.display = "none";
-            highscore_button.style.display = "none";
-            header.textContent = "Najlepsze wyniki";
-            grid_highscore_table.style.display = "block";
-            grid_comeback_button.style.display = "block";
-
-            fill_highscore_table();
-        });*/
-        /*comeback_button.addEventListener('click', event => {
-            const grid_highscore_table = document.getElementById
-                    ("grid_tabela_najlepsze_wyniki") as HTMLElement;
-            const grid_comeback_button = document.getElementById
-                    ("grid_przycisk_wróć") as HTMLElement;
-
-            grid_highscore_table.style.display = "none";
-            grid_comeback_button.style.display = "none";
-
-            show_homepage_view();
-        });*/
-        //let b = spent_time
-        end_quiz_button_1.addEventListener('click', function (event) {
-            /*const header = document.getElementById
-                    ("tytuł_strony") as HTMLElement;
-            const grid_result = document.getElementById
-                    ("grid_liczba_punktów") as HTMLElement;
-            const result = document.getElementById
-                    ("liczba_punktów") as HTMLElement;
-            const grid_summary = document.getElementById
-                    ("grid_tabela_podsumowanie") as HTMLElement;
-            const grid_save_buttons = document.getElementById
-                    ("grid_przyciski_zapis") as HTMLElement;*/
-            clear_after_quiz(question_number_1);
-            send_results();
-            /*header.textContent = "Podsumowanie";
-            grid_result.style.display = "block";
-            grid_summary.style.display = "block";
-            grid_save_buttons.style.display = "block";
-
-            result_value = summarize();
-            result.textContent = "Twój wynik to " + result_value.toString() + " sekund" +
-                    get_polish_suffix(result_value) + ".";*/
-        });
-        /*save_only_result_button.addEventListener('click', event => {
-            save_result();
-
-            get_back_from_summary_to_homepage();
-        });
-
-        save_with_statistics_button.addEventListener('click', event => {
-            save_result();
-            save_statistics();
-
-            get_back_from_summary_to_homepage();
-        });*/
-        setInterval(function () {
-            if (time_1 >= 0) {
-                var time_content = document.getElementById("czas");
-                time_1++;
-                time_content.textContent = time_1.toString() + " sekund" +
-                    get_polish_suffix(time_1);
-                spent_time_1[question_number_1 - 1]++;
+        var jsonString, csrf_value, token, err_1, IQuestions, ICorrectAnswers, quiz, previous_question_button_1, next_question_button_1, cancel_quiz_button, end_quiz_button_1, input_answers, answers_1, spent_time_1, time_1, question_number_1, _loop_1, i;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    csrf_value = document.getElementsByName('_csrf')[0].value;
+                    token = document.querySelector('input[name="_csrf"]').getAttribute('value');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, fetch('/', {
+                            credentials: 'same-origin',
+                            method: 'POST',
+                            body: JSON.stringify({
+                                getQuizJSON: true
+                            }),
+                            headers: {
+                                'CSRF-Token': token,
+                                "Content-Type": "application/json"
+                            }
+                        })
+                            .then(function (response) { return response.json(); })
+                            .then(function (data) {
+                            jsonString = JSON.stringify(data);
+                        })];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    err_1 = _a.sent();
+                    console.log(err_1);
+                    return [3 /*break*/, 4];
+                case 4:
+                    IQuestions = /** @class */ (function () {
+                        function IQuestions() {
+                        }
+                        return IQuestions;
+                    }());
+                    ICorrectAnswers = /** @class */ (function () {
+                        function ICorrectAnswers() {
+                        }
+                        return ICorrectAnswers;
+                    }());
+                    if (check_quiz()) {
+                        previous_question_button_1 = document.getElementById("poprzednie_pytanie");
+                        next_question_button_1 = document.getElementById("następne_pytanie");
+                        cancel_quiz_button = document.getElementById("anuluj_quiz");
+                        end_quiz_button_1 = document.getElementById("zakończ_quiz");
+                        input_answers = document.querySelectorAll("input[type=number][class=odpowiedź]");
+                        answers_1 = new Array(quiz.questions.length);
+                        spent_time_1 = new Array(quiz.questions.length);
+                        time_1 = -1;
+                        question_number_1 = 0;
+                        start();
+                        window.addEventListener('DOMContentLoaded', clear_forms);
+                        _loop_1 = function (i) {
+                            var input_answer = input_answers[i];
+                            input_answer.addEventListener('input', function (event) {
+                                answers_1[i] = input_answer.value;
+                                var count = 0;
+                                for (var j = 0; j < answers_1.length; j++) {
+                                    if (answers_1[j] !== "")
+                                        count++;
+                                }
+                                if (count === answers_1.length) {
+                                    end_quiz_button_1.disabled = false;
+                                }
+                                else {
+                                    end_quiz_button_1.disabled = true;
+                                }
+                            });
+                        };
+                        for (i = 0; i < input_answers.length; i++) {
+                            _loop_1(i);
+                        }
+                        cancel_quiz_button.addEventListener('click', function (event) {
+                            get_back_from_quiz_to_homepage(question_number_1);
+                            question_number_1 = 0;
+                            time_1 = -1;
+                        });
+                        previous_question_button_1.addEventListener('click', function (event) {
+                            switch_off_old_question(question_number_1);
+                            question_number_1--;
+                            set_text_content_to_question_number(question_number_1);
+                        });
+                        next_question_button_1.addEventListener('click', function (event) {
+                            switch_off_old_question(question_number_1);
+                            question_number_1++;
+                            set_text_content_to_question_number(question_number_1);
+                        });
+                        end_quiz_button_1.addEventListener('click', function (event) { return __awaiter(_this, void 0, void 0, function () {
+                            var err_3;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        clear_after_quiz(question_number_1);
+                                        _a.label = 1;
+                                    case 1:
+                                        _a.trys.push([1, 3, , 4]);
+                                        return [4 /*yield*/, send_results()];
+                                    case 2:
+                                        _a.sent();
+                                        return [3 /*break*/, 4];
+                                    case 3:
+                                        err_3 = _a.sent();
+                                        console.log(err_3);
+                                        return [3 /*break*/, 4];
+                                    case 4: return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        setInterval(function () {
+                            if (time_1 >= 0) {
+                                var time_content = document.getElementById("czas");
+                                time_1++;
+                                time_content.textContent = time_1.toString() + " sekund" +
+                                    get_polish_suffix(time_1);
+                                spent_time_1[question_number_1 - 1]++;
+                            }
+                        }, 1000);
+                    }
+                    return [2 /*return*/];
             }
-        }, 1000);
-    }
+        });
+    });
 })();

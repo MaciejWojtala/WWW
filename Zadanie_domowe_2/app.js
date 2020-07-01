@@ -35,42 +35,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 exports.App = void 0;
+var express_1 = __importDefault(require("express"));
+var express_session_1 = __importDefault(require("express-session"));
+var csurf_1 = __importDefault(require("csurf"));
+var cookie_parser_1 = __importDefault(require("cookie-parser"));
+var body_parser_1 = __importDefault(require("body-parser"));
+var password_hash_1 = __importDefault(require("password-hash"));
 var database_1 = require("./database");
 var App = /** @class */ (function () {
     function App(port, source) {
         this.port = port;
         this.source = source;
-        this.db = new database_1.DbClass();
-        this.express = require('express');
-        this.session = require('express-session');
-        this.bodyParser = require('body-parser');
-        this.csurf = require('csurf');
-        this.cookieParser = require('cookie-parser');
-        this.SQLiteStore = require('connect-sqlite3')(this.session);
+        this.exportQuizList = "";
+        this.exportQuiz = "";
+        this.exportQuizResult = "";
+        this.SQLiteStore = require('connect-sqlite3')(express_session_1["default"]);
         this.store = new this.SQLiteStore({ db: ':memory:', dir: './' });
-        this.app = this.express();
-        this.csrfProtection = this.csurf({
+        this.app = express_1["default"]();
+        this.csrfProtection = csurf_1["default"]({
             cookie: true
         });
-        this.app.use(this.session({
+        this.app.use(cookie_parser_1["default"]('secret'));
+        this.app.use(express_session_1["default"]({
             store: this.store,
             secret: 'secret',
             resave: true,
             saveUninitialized: true
         }));
-        this.app.use(this.bodyParser.urlencoded({
+        this.app.use(body_parser_1["default"].urlencoded({
             extended: true
         }));
-        this.app.use(this.cookieParser('secret'));
+        this.app.use(body_parser_1["default"].json());
         this.app.use(this.csrfProtection);
         this.app.set('views', this.source);
         this.app.set('view engine', 'pug');
-        this.app.use(this.express.urlencoded({
+        this.app.use(express_1["default"].urlencoded({
             extended: true
         }));
-        this.app.use(this.express.static(__dirname));
+        this.app.use(express_1["default"].static(__dirname));
     }
     App.prototype.round = function (arg) {
         return Math.round((arg + Number.EPSILON) * 100) / 100;
@@ -87,27 +94,30 @@ var App = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var username, sql, session_rows, err_1, err_2;
+                        var db, username, sql, session_rows, err_1, err_2;
                         var _this = this;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 6, , 11]);
-                                    return [4 /*yield*/, this.db.open()];
+                                    db = new database_1.DbClass();
+                                    _a.label = 1;
                                 case 1:
+                                    _a.trys.push([1, 7, , 12]);
+                                    return [4 /*yield*/, db.open_with_transaction()];
+                                case 2:
                                     _a.sent();
                                     username = req.session.username;
                                     sql = 'INSERT OR REPLACE INTO USERS (user_name, user_password) VALUES (?, ?);';
-                                    return [4 /*yield*/, this.db.run(sql, [username, new_password])];
-                                case 2:
+                                    return [4 /*yield*/, db.run(sql, [username, password_hash_1["default"].generate(new_password)])];
+                                case 3:
                                     _a.sent();
                                     sql = 'SELECT session_ID FROM sessions WHERE user_name = ?';
-                                    return [4 /*yield*/, this.db.all(sql, [username])];
-                                case 3:
+                                    return [4 /*yield*/, db.all(sql, [username])];
+                                case 4:
                                     session_rows = _a.sent();
                                     sql = 'DELETE FROM sessions WHERE user_name = ?';
-                                    return [4 /*yield*/, this.db.run(sql, [username])];
-                                case 4:
+                                    return [4 /*yield*/, db.run(sql, [username])];
+                                case 5:
                                     _a.sent();
                                     session_rows.forEach(function (row) {
                                         _this.store.destroy(row.session_id, function (err) {
@@ -116,27 +126,27 @@ var App = /** @class */ (function () {
                                         });
                                     });
                                     req.session.destroy();
-                                    return [4 /*yield*/, this.db.close()];
-                                case 5:
+                                    return [4 /*yield*/, db.commit_close()];
+                                case 6:
                                     _a.sent();
                                     resolve();
-                                    return [3 /*break*/, 11];
-                                case 6:
-                                    err_1 = _a.sent();
-                                    _a.label = 7;
+                                    return [3 /*break*/, 12];
                                 case 7:
-                                    _a.trys.push([7, 9, , 10]);
-                                    return [4 /*yield*/, this.db.close()];
+                                    err_1 = _a.sent();
+                                    _a.label = 8;
                                 case 8:
+                                    _a.trys.push([8, 10, , 11]);
+                                    return [4 /*yield*/, db.rollback_close()];
+                                case 9:
                                     _a.sent();
                                     reject(err_1);
-                                    return [3 /*break*/, 10];
-                                case 9:
+                                    return [3 /*break*/, 11];
+                                case 10:
                                     err_2 = _a.sent();
                                     reject(err_2);
-                                    return [3 /*break*/, 10];
-                                case 10: return [3 /*break*/, 11];
-                                case 11: return [2 /*return*/];
+                                    return [3 /*break*/, 11];
+                                case 11: return [3 /*break*/, 12];
+                                case 12: return [2 /*return*/];
                             }
                         });
                     }); })];
@@ -144,74 +154,21 @@ var App = /** @class */ (function () {
         });
     };
     App.prototype.getQuizPage = function (req, res, quiz_name) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var quiz, sql, quiz_rows, err_3, err_4, err_5;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    _a.trys.push([0, 7, , 12]);
-                                    return [4 /*yield*/, this.db.open()];
-                                case 1:
-                                    _a.sent();
-                                    sql = 'SELECT quiz_json from quizzes WHERE quiz_name = ?;';
-                                    return [4 /*yield*/, this.db.all(sql, [quiz_name])];
-                                case 2:
-                                    quiz_rows = _a.sent();
-                                    quiz_rows.forEach(function (row) {
-                                        quiz = row.quiz_json;
-                                    });
-                                    _a.label = 3;
-                                case 3:
-                                    _a.trys.push([3, 5, , 6]);
-                                    return [4 /*yield*/, this.db.close()];
-                                case 4:
-                                    _a.sent();
-                                    return [3 /*break*/, 6];
-                                case 5:
-                                    err_3 = _a.sent();
-                                    reject(err_3);
-                                    return [3 /*break*/, 6];
-                                case 6: return [3 /*break*/, 12];
-                                case 7:
-                                    err_4 = _a.sent();
-                                    _a.label = 8;
-                                case 8:
-                                    _a.trys.push([8, 10, , 11]);
-                                    return [4 /*yield*/, this.db.close()];
-                                case 9:
-                                    _a.sent();
-                                    return [3 /*break*/, 11];
-                                case 10:
-                                    err_5 = _a.sent();
-                                    reject(err_5);
-                                    return [3 /*break*/, 11];
-                                case 11:
-                                    reject(err_4);
-                                    return [3 /*break*/, 12];
-                                case 12:
-                                    req.session.begin_time = new Date().getTime();
-                                    res.render('quiz', { _quiz: quiz, _req: req });
-                                    resolve();
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); })];
-            });
-        });
+        res.render('quiz', { _req: req });
     };
     App.prototype.setStatsTable = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var quiz_size, highscore, avg, bests, i, i, j, i, sql_1, highscore_rows_1, j, j, sql, highscore_rows, j, j, err_6;
+                        var db, quiz_size, highscore, avg, bests, i, i, j, sql, highscore_rows, i, j, j, j, j, err_3, err_4;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 10, , 11]);
+                                    db = new database_1.DbClass();
+                                    _a.label = 1;
+                                case 1:
+                                    _a.trys.push([1, 11, , 16]);
                                     quiz_size = 7;
                                     highscore = 5;
                                     avg = new Array(quiz_size);
@@ -224,40 +181,42 @@ var App = /** @class */ (function () {
                                         for (j = 0; j < highscore; j++)
                                             bests[i][j] = '-';
                                     }
-                                    return [4 /*yield*/, this.db.open()];
-                                case 1:
-                                    _a.sent();
-                                    i = 0;
-                                    _a.label = 2;
+                                    return [4 /*yield*/, db.open_with_transaction()];
                                 case 2:
-                                    if (!(i < quiz_size - 1)) return [3 /*break*/, 6];
-                                    sql_1 = 'SELECT result FROM question_results WHERE question_nr = ? AND quiz_name = ? ORDER BY result  ASC';
-                                    return [4 /*yield*/, this.db.all(sql_1, [i + 1, req.session.quiz_name])];
+                                    _a.sent();
+                                    sql = void 0;
+                                    highscore_rows = void 0;
+                                    i = 0;
+                                    _a.label = 3;
                                 case 3:
-                                    highscore_rows_1 = _a.sent();
-                                    for (j = 0; j < highscore_rows_1.length; j++) {
-                                        if (j >= 5)
-                                            break;
-                                        bests[i][j] = highscore_rows_1[j].result;
-                                    }
-                                    sql_1 = 'SELECT AVG(result) as avg FROM question_results WHERE question_nr = ? AND quiz_name = ? AND punishment = ?';
-                                    return [4 /*yield*/, this.db.all(sql_1, [i + 1, req.session.quiz_name, 0])];
+                                    if (!(i < quiz_size - 1)) return [3 /*break*/, 7];
+                                    sql = 'SELECT result FROM question_results WHERE question_nr = ? AND quiz_name = ? ORDER BY result ASC';
+                                    return [4 /*yield*/, db.all(sql, [i + 1, req.session.quiz_name])];
                                 case 4:
-                                    highscore_rows_1 = _a.sent();
-                                    for (j = 0; j < highscore_rows_1.length; j++) {
+                                    highscore_rows = _a.sent();
+                                    for (j = 0; j < highscore_rows.length; j++) {
                                         if (j >= 5)
                                             break;
-                                        if (highscore_rows_1[j].avg != null)
-                                            avg[i] = this.round(highscore_rows_1[j].avg).toString();
+                                        bests[i][j] = highscore_rows[j].result;
                                     }
-                                    _a.label = 5;
+                                    sql = 'SELECT AVG(result) as avg FROM question_results WHERE question_nr = ? AND quiz_name = ? AND punishment = ?';
+                                    return [4 /*yield*/, db.all(sql, [i + 1, req.session.quiz_name, 0])];
                                 case 5:
-                                    i++;
-                                    return [3 /*break*/, 2];
+                                    highscore_rows = _a.sent();
+                                    for (j = 0; j < highscore_rows.length; j++) {
+                                        if (j >= 5)
+                                            break;
+                                        if (highscore_rows[j].avg != null)
+                                            avg[i] = this.round(highscore_rows[j].avg).toString();
+                                    }
+                                    _a.label = 6;
                                 case 6:
-                                    sql = 'SELECT result FROM results WHERE quiz_name = ? ORDER BY result  ASC';
-                                    return [4 /*yield*/, this.db.all(sql, [req.session.quiz_name])];
+                                    i++;
+                                    return [3 /*break*/, 3];
                                 case 7:
+                                    sql = 'SELECT result FROM results WHERE quiz_name = ? ORDER BY result  ASC';
+                                    return [4 /*yield*/, db.all(sql, [req.session.quiz_name])];
+                                case 8:
                                     highscore_rows = _a.sent();
                                     for (j = 0; j < highscore_rows.length; j++) {
                                         if (j >= 5)
@@ -265,8 +224,8 @@ var App = /** @class */ (function () {
                                         bests[6][j] = highscore_rows[j].result;
                                     }
                                     sql = 'SELECT AVG(result) as avg FROM results WHERE quiz_name = ?';
-                                    return [4 /*yield*/, this.db.all(sql, [req.session.quiz_name])];
-                                case 8:
+                                    return [4 /*yield*/, db.all(sql, [req.session.quiz_name])];
+                                case 9:
                                     highscore_rows = _a.sent();
                                     for (j = 0; j < highscore_rows.length; j++) {
                                         if (j >= 5)
@@ -274,16 +233,27 @@ var App = /** @class */ (function () {
                                         if (highscore_rows[j].avg != null)
                                             avg[6] = this.round(highscore_rows[j].avg).toString();
                                     }
-                                    return [4 /*yield*/, this.db.close()];
-                                case 9:
+                                    return [4 /*yield*/, db.commit_close()];
+                                case 10:
                                     _a.sent();
                                     resolve({ bests: bests, avg: avg });
-                                    return [3 /*break*/, 11];
-                                case 10:
-                                    err_6 = _a.sent();
-                                    reject(err_6);
-                                    return [3 /*break*/, 11];
-                                case 11: return [2 /*return*/];
+                                    return [3 /*break*/, 16];
+                                case 11:
+                                    err_3 = _a.sent();
+                                    _a.label = 12;
+                                case 12:
+                                    _a.trys.push([12, 14, , 15]);
+                                    return [4 /*yield*/, db.rollback_close()];
+                                case 13:
+                                    _a.sent();
+                                    reject(err_3);
+                                    return [3 /*break*/, 15];
+                                case 14:
+                                    err_4 = _a.sent();
+                                    reject(err_4);
+                                    return [3 /*break*/, 15];
+                                case 15: return [3 /*break*/, 16];
+                                case 16: return [2 /*return*/];
                             }
                         });
                     }); })];
@@ -295,7 +265,7 @@ var App = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var json_result, err_7;
+                        var json_result, err_5;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
@@ -307,8 +277,8 @@ var App = /** @class */ (function () {
                                     resolve();
                                     return [3 /*break*/, 3];
                                 case 2:
-                                    err_7 = _a.sent();
-                                    reject(err_7);
+                                    err_5 = _a.sent();
+                                    reject(err_5);
                                     return [3 /*break*/, 3];
                                 case 3: return [2 /*return*/];
                             }
@@ -319,7 +289,7 @@ var App = /** @class */ (function () {
     };
     App.prototype.getChooseQuizPage = function (req, res) {
         var quizzes_list = req.session.quizzes_list;
-        res.render('choose_quiz', { quizzes: JSON.parse(quizzes_list).quizzes, _req: req });
+        res.render('choose_quiz', { _req: req });
     };
     App.prototype.getChangePasswordPage = function (req, res, message) {
         res.render("change_password", { title: 'Zmiana hasła', _message: message, _req: req });
@@ -337,28 +307,85 @@ var App = /** @class */ (function () {
             }
         });
     };
-    App.prototype.save_result = function (req, next, quiz_result_json) {
+    App.prototype.postQuizRequest = function (req, res, quiz_name) {
+        var _this = this;
+        return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+            var quiz, db, sql, quiz_rows, err_6, err_7;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        db = new database_1.DbClass();
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 5, , 10]);
+                        return [4 /*yield*/, db.open_with_transaction()];
+                    case 2:
+                        _a.sent();
+                        sql = 'SELECT quiz_json from quizzes WHERE quiz_name = ?;';
+                        return [4 /*yield*/, db.all(sql, [quiz_name])];
+                    case 3:
+                        quiz_rows = _a.sent();
+                        quiz_rows.forEach(function (row) {
+                            quiz = row.quiz_json;
+                            _this.exportQuiz = quiz;
+                        });
+                        return [4 /*yield*/, db.commit_close()];
+                    case 4:
+                        _a.sent();
+                        return [3 /*break*/, 10];
+                    case 5:
+                        err_6 = _a.sent();
+                        _a.label = 6;
+                    case 6:
+                        _a.trys.push([6, 8, , 9]);
+                        return [4 /*yield*/, db.rollback_close()];
+                    case 7:
+                        _a.sent();
+                        reject(err_6);
+                        return [3 /*break*/, 9];
+                    case 8:
+                        err_7 = _a.sent();
+                        reject(err_7);
+                        return [3 /*break*/, 9];
+                    case 9: return [3 /*break*/, 10];
+                    case 10:
+                        try {
+                            req.session.begin_time = new Date().getTime();
+                            res.send(JSON.parse(quiz));
+                            resolve();
+                        }
+                        catch (err) {
+                            reject(err);
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    };
+    App.prototype.getExportQuiz = function () {
+        return this.exportQuiz;
+    };
+    App.prototype.save_result = function (req, res, next, quiz_result) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var total_time, result, quiz_result, quiz, punishments, question_results, question_times, i, i, err_8, err_9;
+                        var total_time, result, db, quiz, punishments, question_results, question_times, i, i, json, err_8, err_9;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
                                     total_time = (req.session.end_time - req.session.begin_time) / 1000;
                                     result = 0;
+                                    db = new database_1.DbClass();
                                     _a.label = 1;
                                 case 1:
-                                    _a.trys.push([1, 11, , 16]);
-                                    return [4 /*yield*/, this.db.open()];
+                                    _a.trys.push([1, 10, , 15]);
+                                    return [4 /*yield*/, db.open_with_transaction()];
                                 case 2:
                                     _a.sent();
-                                    return [4 /*yield*/, JSON.parse(quiz_result_json)];
-                                case 3:
-                                    quiz_result = _a.sent();
                                     return [4 /*yield*/, JSON.parse(quiz_result.jsonString)];
-                                case 4:
+                                case 3:
                                     quiz = _a.sent();
                                     punishments = new Array(quiz.questions.length);
                                     question_results = new Array(quiz.questions.length);
@@ -372,59 +399,70 @@ var App = /** @class */ (function () {
                                         result += question_results[i];
                                     }
                                     result = this.round(result);
-                                    return [4 /*yield*/, this.db.run('INSERT OR REPLACE INTO results (user_name, quiz_name, result) VALUES (?, ?, ?);', [req.session.username, quiz.name, result])];
-                                case 5:
+                                    return [4 /*yield*/, db.run('INSERT OR REPLACE INTO results (user_name, quiz_name, result) VALUES (?, ?, ?);', [req.session.username, quiz.name, result])];
+                                case 4:
                                     _a.sent();
                                     i = 0;
-                                    _a.label = 6;
-                                case 6:
-                                    if (!(i < quiz.questions.length)) return [3 /*break*/, 9];
-                                    return [4 /*yield*/, this.db.run('INSERT OR REPLACE INTO question_results (question_nr, user_name, quiz_name, time, answer, correct_answer, punishment, result) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ;', [i + 1, req.session.username, quiz.name,
+                                    _a.label = 5;
+                                case 5:
+                                    if (!(i < quiz.questions.length)) return [3 /*break*/, 8];
+                                    return [4 /*yield*/, db.run('INSERT OR REPLACE INTO question_results (question_nr, user_name, quiz_name, time, answer, correct_answer, punishment, result) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ;', [i + 1, req.session.username, quiz.name,
                                             question_times[i], quiz_result.answers[i], quiz.correct_answers[i],
                                             punishments[i], question_results[i]])];
+                                case 6:
+                                    _a.sent();
+                                    _a.label = 7;
                                 case 7:
-                                    _a.sent();
-                                    _a.label = 8;
-                                case 8:
                                     i++;
-                                    return [3 /*break*/, 6];
-                                case 9: return [4 /*yield*/, this.db.close()];
-                                case 10:
+                                    return [3 /*break*/, 5];
+                                case 8: return [4 /*yield*/, db.commit_close()];
+                                case 9:
                                     _a.sent();
+                                    json = {};
+                                    res.send(json);
                                     resolve();
-                                    return [3 /*break*/, 16];
-                                case 11:
+                                    return [3 /*break*/, 15];
+                                case 10:
                                     err_8 = _a.sent();
-                                    _a.label = 12;
+                                    _a.label = 11;
+                                case 11:
+                                    _a.trys.push([11, 13, , 14]);
+                                    return [4 /*yield*/, db.rollback_close()];
                                 case 12:
-                                    _a.trys.push([12, 14, , 15]);
-                                    return [4 /*yield*/, this.db.close()];
-                                case 13:
                                     _a.sent();
                                     reject(err_8);
-                                    return [3 /*break*/, 15];
-                                case 14:
+                                    return [3 /*break*/, 14];
+                                case 13:
                                     err_9 = _a.sent();
                                     reject(err_9);
-                                    return [3 /*break*/, 15];
-                                case 15: return [3 /*break*/, 16];
-                                case 16: return [2 /*return*/];
+                                    return [3 /*break*/, 14];
+                                case 14: return [3 /*break*/, 15];
+                                case 15: return [2 /*return*/];
                             }
                         });
                     }); })];
             });
         });
     };
+    App.prototype.getExportQuizResult = function () {
+        return this.exportQuizResult;
+    };
     App.prototype.getSummarize = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var username, quiz_name, result_1, quiz_length, question_times_1, answers_1, correct_answers_1, punishments_1, question_results_1, sql, summarize_rows, _loop_1, this_1, i, err_10;
+                        var db, username, quiz_name, result_1, quiz_length, question_times_1, answers_1, correct_answers_1, punishments_1, question_results_1, sql, summarize_rows, _loop_1, i, err_10, err_11;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 6, , 7]);
+                                    db = new database_1.DbClass();
+                                    _a.label = 1;
+                                case 1:
+                                    _a.trys.push([1, 9, , 14]);
+                                    return [4 /*yield*/, db.open_with_transaction()];
+                                case 2:
+                                    _a.sent();
                                     username = req.session.username;
                                     quiz_name = req.session.quiz_name;
                                     quiz_length = 6;
@@ -434,8 +472,8 @@ var App = /** @class */ (function () {
                                     punishments_1 = new Array(quiz_length);
                                     question_results_1 = new Array(quiz_length);
                                     sql = 'SELECT * FROM results WHERE user_name = ? AND quiz_name = ?';
-                                    return [4 /*yield*/, this.db.all(sql, [username, quiz_name])];
-                                case 1:
+                                    return [4 /*yield*/, db.all(sql, [username, quiz_name])];
+                                case 3:
                                     summarize_rows = _a.sent();
                                     summarize_rows.forEach(function (row) {
                                         result_1 = row.result;
@@ -446,7 +484,7 @@ var App = /** @class */ (function () {
                                             switch (_a.label) {
                                                 case 0:
                                                     _sql = 'SELECT * FROM question_results WHERE question_nr = ? AND user_name = ? AND quiz_name = ?';
-                                                    return [4 /*yield*/, this_1.db.all(_sql, [i + 1, username, quiz_name])];
+                                                    return [4 /*yield*/, db.all(_sql, [i + 1, username, quiz_name])];
                                                 case 1:
                                                     _summarize_rows = _a.sent();
                                                     _summarize_rows.forEach(function (row) {
@@ -460,189 +498,468 @@ var App = /** @class */ (function () {
                                             }
                                         });
                                     };
-                                    this_1 = this;
                                     i = 0;
-                                    _a.label = 2;
-                                case 2:
-                                    if (!(i < quiz_length)) return [3 /*break*/, 5];
-                                    return [5 /*yield**/, _loop_1(i)];
-                                case 3:
-                                    _a.sent();
                                     _a.label = 4;
                                 case 4:
-                                    i++;
-                                    return [3 /*break*/, 2];
+                                    if (!(i < quiz_length)) return [3 /*break*/, 7];
+                                    return [5 /*yield**/, _loop_1(i)];
                                 case 5:
+                                    _a.sent();
+                                    _a.label = 6;
+                                case 6:
+                                    i++;
+                                    return [3 /*break*/, 4];
+                                case 7: return [4 /*yield*/, db.commit_close()];
+                                case 8:
+                                    _a.sent();
                                     res.render('result', { title: 'Podsumowanie', message: 'Twój wynik', _req: req, _quiz_result: JSON.stringify({ result: result_1, question_times: question_times_1, answers: answers_1, correct_answers: correct_answers_1, punishments: punishments_1, question_results: question_results_1 }) });
                                     resolve();
-                                    return [3 /*break*/, 7];
-                                case 6:
+                                    return [3 /*break*/, 14];
+                                case 9:
                                     err_10 = _a.sent();
+                                    _a.label = 10;
+                                case 10:
+                                    _a.trys.push([10, 12, , 13]);
+                                    return [4 /*yield*/, db.rollback_close()];
+                                case 11:
+                                    _a.sent();
                                     reject(err_10);
-                                    return [3 /*break*/, 7];
-                                case 7: return [2 /*return*/];
+                                    return [3 /*break*/, 13];
+                                case 12:
+                                    err_11 = _a.sent();
+                                    reject(err_11);
+                                    return [3 /*break*/, 13];
+                                case 13: return [3 /*break*/, 14];
+                                case 14: return [2 /*return*/];
                             }
                         });
                     }); })];
             });
         });
+    };
+    App.prototype.postQuizList = function (req, res, next) {
+        try {
+            res.send(JSON.parse(req.session.quizzes_list));
+        }
+        catch (err) {
+            next(err);
+        }
     };
     App.prototype.postLoginPage = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var username, password, sql, user_rows, err_11, quizzes_lists_array, err_12, err_13, err_14;
+                        var username, password, db, sql, user_rows, quizzes_lists_array, err_12, err_13;
                         var _this = this;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
                                     username = req.body.username;
                                     password = req.body.password;
-                                    sql = "SELECT *\n                FROM users\n                WHERE user_name = ? AND user_password = ?;";
+                                    db = new database_1.DbClass();
+                                    sql = "SELECT *\n                FROM users\n                WHERE user_name = ?;";
                                     _a.label = 1;
                                 case 1:
-                                    _a.trys.push([1, 14, , 19]);
-                                    return [4 /*yield*/, this.db.open()];
+                                    _a.trys.push([1, 10, , 15]);
+                                    return [4 /*yield*/, db.open_with_transaction()];
                                 case 2:
                                     _a.sent();
-                                    return [4 /*yield*/, this.db.all(sql, [username, password])];
+                                    return [4 /*yield*/, db.all(sql, [username])];
                                 case 3:
                                     user_rows = _a.sent();
-                                    user_rows.forEach(function (row) { return __awaiter(_this, void 0, void 0, function () {
-                                        var err_15, err_16;
-                                        return __generator(this, function (_a) {
-                                            switch (_a.label) {
-                                                case 0:
-                                                    req.session.isLogged = true;
-                                                    req.session.username = username;
-                                                    sql = 'INSERT OR REPLACE INTO sessions (session_id, user_name) VALUES (?, ?);';
-                                                    _a.label = 1;
-                                                case 1:
-                                                    _a.trys.push([1, 3, , 8]);
-                                                    return [4 /*yield*/, this.db.run(sql, [req.sessionID, username])];
-                                                case 2:
-                                                    _a.sent();
-                                                    return [3 /*break*/, 8];
-                                                case 3:
-                                                    err_15 = _a.sent();
-                                                    _a.label = 4;
-                                                case 4:
-                                                    _a.trys.push([4, 6, , 7]);
-                                                    return [4 /*yield*/, this.db.close()];
-                                                case 5:
-                                                    _a.sent();
-                                                    reject(err_15);
-                                                    return [3 /*break*/, 7];
-                                                case 6:
-                                                    err_16 = _a.sent();
-                                                    reject(err_16);
-                                                    return [3 /*break*/, 7];
-                                                case 7: return [3 /*break*/, 8];
-                                                case 8: return [2 /*return*/];
-                                            }
-                                        });
-                                    }); });
-                                    if (!!req.session.isLogged) return [3 /*break*/, 8];
-                                    this.getLoginPage(req, res, "Błędne dane logowania");
-                                    _a.label = 4;
+                                    if (!(user_rows.length === 1)) return [3 /*break*/, 5];
+                                    if (!password_hash_1["default"].verify(password, user_rows[0].user_password)) return [3 /*break*/, 5];
+                                    req.session.isLogged = true;
+                                    req.session.username = username;
+                                    sql = 'INSERT OR REPLACE INTO sessions (session_id, user_name) VALUES (?, ?);';
+                                    return [4 /*yield*/, db.run(sql, [req.sessionID, username])];
                                 case 4:
-                                    _a.trys.push([4, 6, , 7]);
-                                    return [4 /*yield*/, this.db.close()];
-                                case 5:
                                     _a.sent();
-                                    resolve();
-                                    return [3 /*break*/, 7];
+                                    _a.label = 5;
+                                case 5:
+                                    if (!!req.session.isLogged) return [3 /*break*/, 6];
+                                    this.getLoginPage(req, res, "Błędne dane logowania");
+                                    return [3 /*break*/, 8];
                                 case 6:
-                                    err_11 = _a.sent();
-                                    reject(err_11);
-                                    return [3 /*break*/, 7];
-                                case 7: return [3 /*break*/, 13];
-                                case 8:
                                     sql =
-                                        "SELECT quiz_list\n                    FROM quizzes_list;";
-                                    return [4 /*yield*/, this.db.all(sql, [])];
-                                case 9:
+                                        "SELECT quiz_list\n                        FROM quizzes_list;";
+                                    return [4 /*yield*/, db.all(sql, [])];
+                                case 7:
                                     quizzes_lists_array = _a.sent();
                                     quizzes_lists_array.forEach(function (row) {
                                         req.session.quizzes_list = row.quiz_list;
+                                        _this.exportQuizList = req.session.quizzes_list;
                                     });
                                     this.getChooseQuizPage(req, res);
-                                    _a.label = 10;
-                                case 10:
-                                    _a.trys.push([10, 12, , 13]);
-                                    return [4 /*yield*/, this.db.close()];
-                                case 11:
+                                    _a.label = 8;
+                                case 8: return [4 /*yield*/, db.commit_close()];
+                                case 9:
                                     _a.sent();
                                     resolve();
-                                    return [3 /*break*/, 13];
-                                case 12:
+                                    return [3 /*break*/, 15];
+                                case 10:
                                     err_12 = _a.sent();
-                                    reject(err_12);
-                                    return [3 /*break*/, 13];
-                                case 13: return [3 /*break*/, 19];
-                                case 14:
-                                    err_13 = _a.sent();
-                                    _a.label = 15;
-                                case 15:
-                                    _a.trys.push([15, 17, , 18]);
-                                    return [4 /*yield*/, this.db.close()];
-                                case 16:
+                                    _a.label = 11;
+                                case 11:
+                                    _a.trys.push([11, 13, , 14]);
+                                    return [4 /*yield*/, db.rollback_close()];
+                                case 12:
                                     _a.sent();
+                                    reject(err_12);
+                                    return [3 /*break*/, 14];
+                                case 13:
+                                    err_13 = _a.sent();
                                     reject(err_13);
-                                    return [3 /*break*/, 18];
-                                case 17:
-                                    err_14 = _a.sent();
-                                    reject(err_14);
-                                    return [3 /*break*/, 18];
-                                case 18: return [3 /*break*/, 19];
-                                case 19: return [2 /*return*/];
+                                    return [3 /*break*/, 14];
+                                case 14: return [3 /*break*/, 15];
+                                case 15: return [2 /*return*/];
                             }
                         });
                     }); })];
             });
         });
     };
+    App.prototype.getExportQuizList = function () {
+        return this.exportQuizList;
+    };
     App.prototype.wasFilled = function (req) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var results_rows, err_17, err_18;
+                        var db, results_rows, err_14, err_15;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 4, , 9]);
-                                    return [4 /*yield*/, this.db.open()];
+                                    db = new database_1.DbClass();
+                                    _a.label = 1;
                                 case 1:
-                                    _a.sent();
-                                    return [4 /*yield*/, this.db.all('SELECT * FROM results WHERE user_name = ? AND quiz_name = ?;', [req.session.username, req.session.quiz_name])];
+                                    _a.trys.push([1, 5, , 10]);
+                                    return [4 /*yield*/, db.open_with_transaction()];
                                 case 2:
-                                    results_rows = _a.sent();
-                                    return [4 /*yield*/, this.db.close()];
+                                    _a.sent();
+                                    return [4 /*yield*/, db.all('SELECT * FROM results WHERE user_name = ? AND quiz_name = ?;', [req.session.username, req.session.quiz_name])];
                                 case 3:
+                                    results_rows = _a.sent();
+                                    return [4 /*yield*/, db.commit_close()];
+                                case 4:
                                     _a.sent();
                                     if (results_rows.length > 0)
                                         resolve(true);
                                     else
                                         resolve(false);
-                                    return [3 /*break*/, 9];
-                                case 4:
-                                    err_17 = _a.sent();
-                                    _a.label = 5;
+                                    return [3 /*break*/, 10];
                                 case 5:
-                                    _a.trys.push([5, 7, , 8]);
-                                    return [4 /*yield*/, this.db.close()];
+                                    err_14 = _a.sent();
+                                    _a.label = 6;
                                 case 6:
+                                    _a.trys.push([6, 8, , 9]);
+                                    return [4 /*yield*/, db.rollback_close()];
+                                case 7:
+                                    _a.sent();
+                                    reject(err_14);
+                                    return [3 /*break*/, 9];
+                                case 8:
+                                    err_15 = _a.sent();
+                                    reject(err_15);
+                                    return [3 /*break*/, 9];
+                                case 9: return [3 /*break*/, 10];
+                                case 10: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    App.prototype.loging_handle = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var err_16;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!req.body.login_send) return [3 /*break*/, 5];
+                                    _a.label = 1;
+                                case 1:
+                                    _a.trys.push([1, 3, , 4]);
+                                    return [4 /*yield*/, this.postLoginPage(req, res)];
+                                case 2:
+                                    _a.sent();
+                                    resolve(true);
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    err_16 = _a.sent();
+                                    reject(err_16);
+                                    return [3 /*break*/, 4];
+                                case 4: return [3 /*break*/, 6];
+                                case 5:
+                                    if (!req.session.isLogged) {
+                                        this.getLoginPage(req, res, 'Zaloguj się');
+                                        resolve(true);
+                                    }
+                                    else if (req.body.logout) {
+                                        try {
+                                            req.session.isLogged = false;
+                                            this.getLoginPage(req, res, 'Zaloguj się');
+                                            resolve(true);
+                                        }
+                                        catch (err) {
+                                            reject(err);
+                                        }
+                                    }
+                                    else if (req.body.change_password) {
+                                        this.getChangePasswordPage(req, res, 'Zmień hasło');
+                                        resolve(true);
+                                    }
+                                    else if (req.body.comeback_change || req.body.comeback_quiz_menu) {
+                                        this.getChooseQuizPage(req, res);
+                                        resolve(true);
+                                    }
+                                    else {
+                                        resolve(false);
+                                    }
+                                    _a.label = 6;
+                                case 6: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    App.prototype.quiz_menu_handle = function (req, res, next) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var db, sql, quizes_rows, err_17, err_18, wasSolved, err_19, wasSolved, err_20, err_21;
+                        var _this = this;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!req.body.quiz) return [3 /*break*/, 11];
+                                    db = new database_1.DbClass();
+                                    _a.label = 1;
+                                case 1:
+                                    _a.trys.push([1, 5, , 10]);
+                                    return [4 /*yield*/, db.open_with_transaction()];
+                                case 2:
+                                    _a.sent();
+                                    sql = "SELECT quiz_name, quiz_json\n                        FROM quizzes;";
+                                    return [4 /*yield*/, db.all(sql, [])];
+                                case 3:
+                                    quizes_rows = _a.sent();
+                                    return [4 /*yield*/, db.commit_close()];
+                                case 4:
+                                    _a.sent();
+                                    quizes_rows.forEach(function (row) {
+                                        if (req.body.quiz === row.quiz_name) {
+                                            _this.getQuizMenuPage(req, res, row.quiz_name, row.quiz_name + ' - menu');
+                                        }
+                                    });
+                                    resolve(true);
+                                    return [3 /*break*/, 10];
+                                case 5:
+                                    err_17 = _a.sent();
+                                    _a.label = 6;
+                                case 6:
+                                    _a.trys.push([6, 8, , 9]);
+                                    return [4 /*yield*/, db.rollback_close()];
+                                case 7:
                                     _a.sent();
                                     reject(err_17);
-                                    return [3 /*break*/, 8];
-                                case 7:
+                                    return [3 /*break*/, 9];
+                                case 8:
                                     err_18 = _a.sent();
                                     reject(err_18);
+                                    return [3 /*break*/, 9];
+                                case 9: return [3 /*break*/, 10];
+                                case 10: return [3 /*break*/, 30];
+                                case 11:
+                                    if (!req.body.begin_quiz) return [3 /*break*/, 16];
+                                    _a.label = 12;
+                                case 12:
+                                    _a.trys.push([12, 14, , 15]);
+                                    return [4 /*yield*/, this.wasFilled(req)];
+                                case 13:
+                                    wasSolved = _a.sent();
+                                    if (wasSolved) {
+                                        this.getQuizMenuPage(req, res, req.session.quiz_name, 'Już wypełniono quiz');
+                                    }
+                                    else if (req.session.begin_time &&
+                                        (!req.session.end_time || req.session.begin_time > req.session.end_time)) {
+                                        this.getQuizMenuPage(req, res, req.session.quiz_name, 'Quiz jest aktualnie wypełniany');
+                                    }
+                                    else {
+                                        this.getQuizPage(req, res, req.session.quiz_name);
+                                    }
+                                    resolve(true);
+                                    return [3 /*break*/, 15];
+                                case 14:
+                                    err_19 = _a.sent();
+                                    reject(err_19);
+                                    return [3 /*break*/, 15];
+                                case 15: return [3 /*break*/, 30];
+                                case 16:
+                                    if (!req.body.my_score) return [3 /*break*/, 24];
+                                    _a.label = 17;
+                                case 17:
+                                    _a.trys.push([17, 22, , 23]);
+                                    return [4 /*yield*/, this.wasFilled(req)];
+                                case 18:
+                                    wasSolved = _a.sent();
+                                    if (!!wasSolved) return [3 /*break*/, 19];
+                                    this.getQuizMenuPage(req, res, req.session.quiz_name, 'Jeszcze nie wypełniono quizu');
+                                    return [3 /*break*/, 21];
+                                case 19: return [4 /*yield*/, this.getSummarize(req, res)];
+                                case 20:
+                                    _a.sent();
+                                    _a.label = 21;
+                                case 21: return [3 /*break*/, 23];
+                                case 22:
+                                    err_20 = _a.sent();
+                                    reject(err_20);
+                                    return [3 /*break*/, 23];
+                                case 23:
+                                    resolve(true);
+                                    return [3 /*break*/, 30];
+                                case 24:
+                                    if (!req.body.stats) return [3 /*break*/, 29];
+                                    _a.label = 25;
+                                case 25:
+                                    _a.trys.push([25, 27, , 28]);
+                                    return [4 /*yield*/, this.getStats(req, res)];
+                                case 26:
+                                    _a.sent();
+                                    resolve(true);
+                                    return [3 /*break*/, 28];
+                                case 27:
+                                    err_21 = _a.sent();
+                                    reject(err_21);
+                                    return [3 /*break*/, 28];
+                                case 28: return [3 /*break*/, 30];
+                                case 29:
+                                    if (req.body.comeback_stats) {
+                                        this.getQuizMenuPage(req, res, req.session.quiz_name, req.session.quiz_name + ' - menu');
+                                        resolve(true);
+                                    }
+                                    else if (req.body.getQuizList) {
+                                        this.postQuizList(req, res, next);
+                                        resolve(true);
+                                    }
+                                    else {
+                                        resolve(false);
+                                    }
+                                    _a.label = 30;
+                                case 30: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    App.prototype.change_password_handle = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var new_password_1, new_password_2, db, err_22;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!req.body.commit_change) return [3 /*break*/, 7];
+                                    if (!(!req.body.new_password_1 || !req.body.new_password_2)) return [3 /*break*/, 1];
+                                    this.getChangePasswordPage(req, res, 'Błędna zmiana hasła');
+                                    resolve(true);
+                                    return [3 /*break*/, 6];
+                                case 1:
+                                    new_password_1 = req.body.new_password_1;
+                                    new_password_2 = req.body.new_password_2;
+                                    if (!(new_password_1 !== new_password_2 || new_password_1 === "")) return [3 /*break*/, 2];
+                                    this.getChangePasswordPage(req, res, 'Błędna zmiana hasła');
+                                    resolve(true);
+                                    return [3 /*break*/, 6];
+                                case 2:
+                                    db = new database_1.DbClass();
+                                    _a.label = 3;
+                                case 3:
+                                    _a.trys.push([3, 5, , 6]);
+                                    return [4 /*yield*/, this.changePassword(req, res, new_password_1)];
+                                case 4:
+                                    _a.sent();
+                                    this.getLoginPage(req, res, 'Zaloguj się');
+                                    resolve(true);
+                                    return [3 /*break*/, 6];
+                                case 5:
+                                    err_22 = _a.sent();
+                                    reject(err_22);
+                                    return [3 /*break*/, 6];
+                                case 6: return [3 /*break*/, 8];
+                                case 7:
+                                    resolve(false);
+                                    _a.label = 8;
+                                case 8: return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    App.prototype.quiz_handle = function (req, res, next) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var wasSolved, err_23;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!req.body.cancel_quiz) return [3 /*break*/, 1];
+                                    req.session.end_time = new Date().getTime();
+                                    this.getQuizMenuPage(req, res, req.session.quiz_name, req.session.quiz_name + ' - menu');
+                                    resolve(true);
+                                    return [3 /*break*/, 10];
+                                case 1:
+                                    if (!req.body.quiz_result) return [3 /*break*/, 9];
+                                    req.session.end_time = new Date().getTime();
+                                    _a.label = 2;
+                                case 2:
+                                    _a.trys.push([2, 7, , 8]);
+                                    return [4 /*yield*/, this.wasFilled(req)];
+                                case 3:
+                                    wasSolved = _a.sent();
+                                    if (!wasSolved) return [3 /*break*/, 4];
+                                    this.getQuizMenuPage(req, res, req.session.quiz_name, 'Już wypełniono quiz');
+                                    return [3 /*break*/, 6];
+                                case 4:
+                                    this.exportQuizResult = JSON.stringify(req.body.quiz_result);
+                                    return [4 /*yield*/, this.save_result(req, res, next, req.body.quiz_result)];
+                                case 5:
+                                    _a.sent();
+                                    _a.label = 6;
+                                case 6:
+                                    resolve(true);
                                     return [3 /*break*/, 8];
-                                case 8: return [3 /*break*/, 9];
-                                case 9: return [2 /*return*/];
+                                case 7:
+                                    err_23 = _a.sent();
+                                    reject(err_23);
+                                    return [3 /*break*/, 8];
+                                case 8: return [3 /*break*/, 10];
+                                case 9:
+                                    if (req.body.comeback_quiz) {
+                                        this.getQuizMenuPage(req, res, req.session.quiz_name, req.session.quiz_name + ' - menu');
+                                        resolve(true);
+                                    }
+                                    else if (req.body.getQuizJSON) {
+                                        this.postQuizRequest(req, res, req.session.quiz_name);
+                                    }
+                                    else {
+                                        resolve(false);
+                                    }
+                                    _a.label = 10;
+                                case 10: return [2 /*return*/];
                             }
                         });
                     }); })];
@@ -652,223 +969,48 @@ var App = /** @class */ (function () {
     App.prototype.postPage = function () {
         var _this = this;
         this.app.post('/', function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-            var err_19, err_20, sql, quizes_rows, err_21, err_22, err_23, wasSolved, err_24, new_password_1, new_password_2, err_25, wasSolved, err_26, wasSolved, err_27, err_28;
-            var _this = this;
+            var flag, err_24;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (req.session.isLogged === undefined)
                             req.session.isLogged = false;
-                        if (!req.body.login_send) return [3 /*break*/, 5];
+                        flag = false;
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.postLoginPage(req, res)];
+                        _a.trys.push([1, 9, , 10]);
+                        return [4 /*yield*/, this.loging_handle(req, res)];
                     case 2:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        flag = _a.sent();
+                        if (!!flag) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.quiz_menu_handle(req, res, next)];
                     case 3:
-                        err_19 = _a.sent();
-                        next(err_19);
-                        return [3 /*break*/, 4];
-                    case 4: return [3 /*break*/, 64];
+                        flag = _a.sent();
+                        _a.label = 4;
+                    case 4:
+                        if (!!flag) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.change_password_handle(req, res)];
                     case 5:
-                        if (!!req.session.isLogged) return [3 /*break*/, 6];
-                        this.getLoginPage(req, res, 'Zaloguj się');
-                        return [3 /*break*/, 64];
+                        flag = _a.sent();
+                        _a.label = 6;
                     case 6:
-                        if (!req.body.logout) return [3 /*break*/, 11];
-                        _a.label = 7;
+                        if (!!flag) return [3 /*break*/, 8];
+                        return [4 /*yield*/, this.quiz_handle(req, res, next)];
                     case 7:
-                        _a.trys.push([7, 9, , 10]);
-                        req.session.isLogged = false;
-                        return [4 /*yield*/, this.getLoginPage(req, res, 'Zaloguj się')];
-                    case 8:
-                        _a.sent();
-                        return [3 /*break*/, 10];
+                        flag = _a.sent();
+                        _a.label = 8;
+                    case 8: return [3 /*break*/, 10];
                     case 9:
-                        err_20 = _a.sent();
-                        next(err_20);
-                        return [3 /*break*/, 10];
-                    case 10: return [3 /*break*/, 64];
-                    case 11:
-                        if (!req.body.change_password) return [3 /*break*/, 12];
-                        this.getChangePasswordPage(req, res, 'Zmień hasło');
-                        return [3 /*break*/, 64];
-                    case 12:
-                        if (!(req.body.comeback_change || req.body.comeback_quiz_menu)) return [3 /*break*/, 13];
-                        this.getChooseQuizPage(req, res);
-                        return [3 /*break*/, 64];
-                    case 13:
-                        if (!req.body.quiz) return [3 /*break*/, 27];
-                        _a.label = 14;
-                    case 14:
-                        _a.trys.push([14, 21, , 26]);
-                        return [4 /*yield*/, this.db.open()];
-                    case 15:
-                        _a.sent();
-                        sql = "SELECT quiz_name, quiz_json\n                    FROM quizzes;";
-                        return [4 /*yield*/, this.db.all(sql, [])];
-                    case 16:
-                        quizes_rows = _a.sent();
-                        _a.label = 17;
-                    case 17:
-                        _a.trys.push([17, 19, , 20]);
-                        return [4 /*yield*/, this.db.close()];
-                    case 18:
-                        _a.sent();
-                        return [3 /*break*/, 20];
-                    case 19:
-                        err_21 = _a.sent();
-                        next(err_21);
-                        return [3 /*break*/, 20];
-                    case 20:
-                        quizes_rows.forEach(function (row) {
-                            if (req.body.quiz === row.quiz_name) {
-                                _this.getQuizMenuPage(req, res, row.quiz_name, row.quiz_name + ' - menu');
-                            }
-                        });
-                        return [3 /*break*/, 26];
-                    case 21:
-                        err_22 = _a.sent();
-                        _a.label = 22;
-                    case 22:
-                        _a.trys.push([22, 24, , 25]);
-                        return [4 /*yield*/, this.db.close()];
-                    case 23:
-                        _a.sent();
-                        next(err_22);
-                        return [3 /*break*/, 25];
-                    case 24:
-                        err_23 = _a.sent();
-                        next(err_23);
-                        return [3 /*break*/, 25];
-                    case 25: return [3 /*break*/, 26];
-                    case 26: return [3 /*break*/, 64];
-                    case 27:
-                        if (!req.body.begin_quiz) return [3 /*break*/, 35];
-                        _a.label = 28;
-                    case 28:
-                        _a.trys.push([28, 33, , 34]);
-                        return [4 /*yield*/, this.wasFilled(req)];
-                    case 29:
-                        wasSolved = _a.sent();
-                        if (!wasSolved) return [3 /*break*/, 30];
-                        this.getQuizMenuPage(req, res, req.session.quiz_name, 'Już wypełniono quiz');
-                        return [3 /*break*/, 32];
-                    case 30: return [4 /*yield*/, this.getQuizPage(req, res, req.session.quiz_name)];
-                    case 31:
-                        _a.sent();
-                        _a.label = 32;
-                    case 32: return [3 /*break*/, 34];
-                    case 33:
                         err_24 = _a.sent();
                         next(err_24);
-                        return [3 /*break*/, 34];
-                    case 34: return [3 /*break*/, 64];
-                    case 35:
-                        if (!req.body.cancel_quiz) return [3 /*break*/, 36];
-                        this.getQuizMenuPage(req, res, req.session.quiz_name, req.session.quiz_name + ' - menu');
-                        return [3 /*break*/, 64];
-                    case 36:
-                        if (!req.body.commit_change) return [3 /*break*/, 44];
-                        if (!(!req.body.new_password_1 || !req.body.new_password_2)) return [3 /*break*/, 37];
-                        this.getChangePasswordPage(req, res, 'Błędna zmiana hasła');
-                        return [3 /*break*/, 43];
-                    case 37:
-                        new_password_1 = req.body.new_password_1;
-                        new_password_2 = req.body.new_password_2;
-                        if (!(new_password_1 !== new_password_2 || new_password_1 === "")) return [3 /*break*/, 38];
-                        this.getChangePasswordPage(req, res, 'Błędna zmiana hasła');
-                        return [3 /*break*/, 43];
-                    case 38:
-                        _a.trys.push([38, 42, , 43]);
-                        return [4 /*yield*/, this.changePassword(req, res, new_password_1)];
-                    case 39:
-                        _a.sent();
-                        return [4 /*yield*/, this.db.open()];
-                    case 40:
-                        _a.sent();
-                        return [4 /*yield*/, this.db.close()];
-                    case 41:
-                        _a.sent();
-                        this.getLoginPage(req, res, 'Zaloguj się');
-                        return [3 /*break*/, 43];
-                    case 42:
-                        err_25 = _a.sent();
-                        next(err_25);
-                        return [3 /*break*/, 43];
-                    case 43: return [3 /*break*/, 64];
-                    case 44:
-                        if (!req.body.quiz_result) return [3 /*break*/, 52];
-                        req.session.end_time = new Date().getTime();
-                        _a.label = 45;
-                    case 45:
-                        _a.trys.push([45, 50, , 51]);
-                        return [4 /*yield*/, this.wasFilled(req)];
-                    case 46:
-                        wasSolved = _a.sent();
-                        if (!wasSolved) return [3 /*break*/, 47];
-                        this.getQuizMenuPage(req, res, req.session.quiz_name, 'Już wypełniono quiz');
-                        return [3 /*break*/, 49];
-                    case 47: return [4 /*yield*/, this.save_result(req, next, req.body.quiz_result)];
-                    case 48:
-                        _a.sent();
-                        this.getSummarize(req, res);
-                        _a.label = 49;
-                    case 49: return [3 /*break*/, 51];
-                    case 50:
-                        err_26 = _a.sent();
-                        next(err_26);
-                        return [3 /*break*/, 51];
-                    case 51: return [3 /*break*/, 64];
-                    case 52:
-                        if (!req.body.comeback_quiz) return [3 /*break*/, 53];
-                        this.getQuizMenuPage(req, res, req.session.quiz_name, req.session.quiz_name + ' - menu');
-                        return [3 /*break*/, 64];
-                    case 53:
-                        if (!req.body.my_score) return [3 /*break*/, 58];
-                        _a.label = 54;
-                    case 54:
-                        _a.trys.push([54, 56, , 57]);
-                        return [4 /*yield*/, this.wasFilled(req)];
-                    case 55:
-                        wasSolved = _a.sent();
-                        if (!wasSolved) {
-                            this.getQuizMenuPage(req, res, req.session.quiz_name, 'Jeszcze nie wypełniono quizu');
-                        }
-                        else {
-                            this.getSummarize(req, res);
-                        }
-                        return [3 /*break*/, 57];
-                    case 56:
-                        err_27 = _a.sent();
-                        next(err_27);
-                        return [3 /*break*/, 57];
-                    case 57: return [3 /*break*/, 64];
-                    case 58:
-                        if (!req.body.stats) return [3 /*break*/, 63];
-                        _a.label = 59;
-                    case 59:
-                        _a.trys.push([59, 61, , 62]);
-                        return [4 /*yield*/, this.getStats(req, res)];
-                    case 60:
-                        _a.sent();
-                        return [3 /*break*/, 62];
-                    case 61:
-                        err_28 = _a.sent();
-                        next(err_28);
-                        return [3 /*break*/, 62];
-                    case 62: return [3 /*break*/, 64];
-                    case 63:
-                        if (req.body.comeback_stats) {
-                            this.getQuizMenuPage(req, res, req.session.quiz_name, req.session.quiz_name + ' - menu');
-                        }
-                        _a.label = 64;
-                    case 64: return [2 /*return*/];
+                        return [3 /*break*/, 10];
+                    case 10: return [2 /*return*/];
                 }
             });
         }); });
+    };
+    App.prototype.close = function () {
+        this.server.close();
     };
     App.prototype.errorHandler = function (err, req, res, next) {
         console.log(err);
@@ -878,7 +1020,7 @@ var App = /** @class */ (function () {
         this.getPage();
         this.postPage();
         this.app.use(this.errorHandler);
-        this.app.listen(this.port, function () { });
+        this.server = this.app.listen(this.port, function () { });
     };
     return App;
 }());

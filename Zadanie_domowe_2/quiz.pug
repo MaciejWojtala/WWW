@@ -171,9 +171,8 @@ html(lang='pl-PL')
             | Zapisz tylko wynik
           button#zapis_wyniku_i_statystyk.przycisk_zapisu(type='button')
             | Zapisz wynik i statystyki
-    input(id = 'quiz_json' type = "hidden" value = _quiz)
-    form(action = "/" method = "POST" id = 'send_form')
-      input(id = 'quiz_result' name = 'quiz_result' type = 'hidden')
+    form(action = "/" method = "POST" id = 'rerender_form')
+      input(id = 'render_summarize' name = 'my_score' value = 'Pokaż mój wynik' type = 'submit' class = 'unseen')
       input(type = "hidden" name = "_csrf" value = _req.csrfToken())
     script#quiz_script(src = "quiz.js")
         
